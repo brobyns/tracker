@@ -104,6 +104,7 @@ class Stats extends Controller
 
 	public function apiPageviews()
 	{
+
 		return Tracker::pageViews($this->minutes)->toJson();
 	}
 

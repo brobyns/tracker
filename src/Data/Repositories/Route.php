@@ -15,12 +15,12 @@ class Route extends Repository {
 
 	public function isTrackable($route)
 	{
-		$forbidden = $this->config->get('do_not_track_routes');
+		$allowed = $this->config->get('track_routes');
 
 		return
-			! $forbidden ||
+			$allowed ||
 			! $route->currentRouteName() ||
-			! in_array_wildcard($route->currentRouteName(), $forbidden);
+			in_array_wildcard($route->currentRouteName(), $allowed);
 	}
 
 }

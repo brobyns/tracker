@@ -9,6 +9,7 @@ use Illuminate\Log\Writer as Logger;
 use PragmaRX\Tracker\Support\Minutes;
 use Illuminate\Foundation\Application as Laravel;
 use PragmaRX\Tracker\Data\RepositoryManager as DataRepositoryManager;
+use Route;
 
 class Tracker
 {
@@ -126,12 +127,14 @@ class Tracker
             'session_id' => $this->getSessionId(true),
             'method'     => $this->request->method(),
             'path_id'    => $this->getPathId(),
+            'route_path_id' => $this->getRoutePathId(),
             'query_id'   => $this->getQueryId(),
             'referer_id' => $this->getRefererId(),
             'is_ajax'    => $this->request->ajax(),
             'is_secure'  => $this->request->isSecure(),
             'is_json'    => $this->request->isJson(),
             'wants_json' => $this->request->wantsJson(),
+            'geoip_id' => $this->getGeoIpId(),
         ];
     }
 
@@ -233,7 +236,8 @@ class Tracker
         $this->parserIsAvailable() &&
         $this->isTrackableIp() &&
         $this->isTrackableEnvironment() &&
-        $this->notRobotOrTrackable();
+        $this->notRobotOrTrackable() &&
+        $this->isTrackableRoute();
     }
 
     protected function isTrackableEnvironment() {
@@ -248,6 +252,20 @@ class Tracker
             $this->request->getClientIp(),
             $this->config->get('do_not_track_ips')
         );
+    }
+
+    protected function isTrackableRoute() {
+        if (is_null($this->request->route()->getName())) {
+            return false;
+        }
+        $routes = $this->config->get('track_routes');
+        foreach ($routes as $route) {
+            $match = preg_grep ('/'. $route .'/i', [$this->request->route()->getName()]);
+            if(!empty($match)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public function logByRouteName($name, $minutes = null) {
@@ -308,6 +326,26 @@ class Tracker
 
     public function pageViewsByCountry($minutes, $results = true) {
         return $this->dataRepositoryManager->pageViewsByCountry(Minutes::make($minutes), $results);
+    }
+
+    public function pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly) {
+        return $this->dataRepositoryManager->pageViewsByRouteName($userid, Minutes::make($minutes), $name, $uniqueOnly);
+    }
+
+    public function referersForUser($userid, $minutes) {
+        return $this->dataRepositoryManager->referersForUser($userid, Minutes::make($minutes));
+    }
+
+    public function countriesForUser($userid, $minutes) {
+        return $this->dataRepositoryManager->countriesForUser($userid, Minutes::make($minutes));
+    }
+
+    public function tiersForUser($userid, $minutes) {
+        return $this->dataRepositoryManager->tiersForUser($userid, Minutes::make($minutes));
+    }
+
+    public function viewsAndEarningsForUser($userid, $minutes) {
+        return $this->dataRepositoryManager->viewsAndEarningsForUser($userid, Minutes::make($minutes));
     }
 
     public function parserIsAvailable() {
@@ -378,5 +416,13 @@ class Tracker
 
     public function users($minutes, $results = true) {
         return $this->dataRepositoryManager->users(Minutes::make($minutes), $results);
+    }
+
+    public function createPath($path, $userid) {
+        $this->dataRepositoryManager->createPath(
+            [
+                'path' => $path,
+                'user_id' => $userid,
+            ]);
     }
 }

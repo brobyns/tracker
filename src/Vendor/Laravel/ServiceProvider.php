@@ -72,7 +72,7 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
 		    $this->registerErrorHandler();
 
-		    $this->bootTracker();
+		    //$this->bootTracker();
 	    }
     }
 
@@ -337,7 +337,7 @@ class ServiceProvider extends PragmaRXServiceProvider {
 	{
 		$me = $this;
 
-		$this->app['events']->listen('router.matched', function() use ($me)
+		$this->app['events']->listen('Illuminate\Routing\Events\RouteMatched', function($event) use ($me)
 		{
 			$me->getTracker()->routerMatched($me->getConfig('log_routes'));
 		});
@@ -402,15 +402,12 @@ class ServiceProvider extends PragmaRXServiceProvider {
 	{
 		$me = $this;
 
-		$this->app['events']->listen('illuminate.query', function($query,
-		                                                          $bindings,
-		                                                          $time,
-		                                                          $name) use ($me)
+		$this->app['events']->listen('Illuminate\Database\Events\ExecutedQuery', function($events) use ($me)
 		{
 			if ($me->getTracker()->isEnabled())
 			{
 				$me->getTracker()->logSqlQuery(
-					$query, $bindings, $time, $name
+					$events->sql, $events->bindings, $events->time, $events->name
 				);
 			}
 		});
@@ -425,7 +422,7 @@ class ServiceProvider extends PragmaRXServiceProvider {
 			return new EventStorage();
 		});
 
-		$this->app['events']->listen('*', function($object = null) use ($me)
+		$this->app['events']->listen('event.*', function($object = null) use ($me)
 		{
 			if ($me->app['tracker.events']->isOff())
 			{

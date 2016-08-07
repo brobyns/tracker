@@ -228,8 +228,7 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function createLog($data) {
         $this->logRepository->createLog($data);
-
-        $this->sqlQueryRepository->fire();
+       //$this->sqlQueryRepository->fire();
     }
 
     private function createRoutePathParameter($route_path_id, $parameter, $value) {
@@ -260,6 +259,10 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function findOrCreatePath($path) {
         return $this->pathRepository->findOrCreate($path, ['path']);
+    }
+
+    public function createPath($data) {
+        return $this->pathRepository->findOrCreate($data, ['path', 'user_id']);
     }
 
     public function findOrCreateQuery($data) {
@@ -570,12 +573,32 @@ class RepositoryManager implements RepositoryManagerInterface
                                         ]);
     }
 
-    public function pageViews($minutes, $results) {
-        return $this->logRepository->pageViews($minutes, $results);
+    public function pageViews($minutes, $uniqueOnly) {
+        return $this->logRepository->pageViews($minutes, $uniqueOnly);
     }
 
     public function pageViewsByCountry($minutes, $results) {
         return $this->logRepository->pageViewsByCountry($minutes, $results);
+    }
+
+    public function pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly) {
+        return $this->logRepository->pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly);
+    }
+
+    public function referersForUser($userid, $minutes) {
+        return $this->logRepository->referersForUser($userid, $minutes);
+    }
+
+    public function countriesForUser($userid, $minutes) {
+        return $this->logRepository->countriesForUser($userid, $minutes);
+    }
+
+    public function tiersForUser($userid, $minutes) {
+        return $this->logRepository->tiersForUser($userid, $minutes);
+    }
+
+    public function viewsAndEarningsForUser($userid, $minutes) {
+        return $this->logRepository->viewsAndEarningsForUser($userid, $minutes);
     }
 
     public function parserIsAvailable() {

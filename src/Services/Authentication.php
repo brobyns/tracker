@@ -36,7 +36,8 @@ class Authentication {
     {
         if ($this->check())
         {
-            return $this->user()->{$this->config->get('authenticated_user_id_column')};
+            $userid = $this->user()->{$this->config->get('authenticated_user_id_column')};
+            return $userid;
         }
 
         return null;

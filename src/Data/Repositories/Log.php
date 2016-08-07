@@ -83,6 +83,28 @@ class Log extends Repository
 		 return $this->getModel()->pageViewsByCountry($minutes, $results);
 	}
 
+    public function pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly)
+    {
+        return $this->getModel()->pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly);
+    }
+
+	public function referersForUser($userid, $minutes)
+	{
+		return $this->getModel()->referersForUser($userid, $minutes);
+	}
+
+	public function countriesForUser($userid, $minutes) {
+		return $this->getModel()->countriesForUser($userid, $minutes);
+	}
+
+	public function tiersForUser($userid, $minutes) {
+		return $this->getModel()->tiersForUser($userid, $minutes);
+	}
+
+	public function viewsAndEarningsForUser($userid, $minutes) {
+		return $this->getModel()->viewsAndEarningsForUser($userid, $minutes);
+	}
+
 	public function getErrors($minutes, $results)
 	{
 		return $this->getModel()->errors($minutes, $results);

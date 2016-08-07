@@ -26,6 +26,7 @@ class CreateTrackerPathsTable extends Migration {
 				$table->bigIncrements('id');
 
 				$table->string('path')->index();
+				$table->bigInteger('user_id')->unsigned()->index();
 
 				$table->timestamp('created_at')->index();
 				$table->timestamp('updated_at')->index();
