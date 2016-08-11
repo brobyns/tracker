@@ -16,25 +16,16 @@ class Earnings extends Repository {
         $earnings = $this->newQuery()->where('user_id', $userid)
             ->where('date', Carbon::today())->first();
 
-        $views = ($earnings)? $earnings->getAttribute('views') + 1 : 1;
-        $amount = ($earnings)? $earnings->getAttribute('amount') + $amount : $amount;
-
-        $data = array(
-            'user_id' => $userid,
-            'amount' => $amount,
-            'views' => $views,
-            'date' => Carbon::today()
-        );
-
-
-        foreach($earnings->getAttributes() as $name => $value)
-        {
-            if (isset($data[$name]) && $name !== 'id')
-            {
-                $earnings->{$name} = $data[$name];
-            }
+        if ($earnings) {
+            $earnings->views++;
+            $earnings->amount += $amount;
+        } else {
+            $earnings = $this->newModel();
+            $earnings->user_id = $userid;
+            $earnings->views = 1;
+            $earnings->amount = $amount;
+            $earnings->date = Carbon::today();
         }
-
         $earnings->save();
     }
 }
