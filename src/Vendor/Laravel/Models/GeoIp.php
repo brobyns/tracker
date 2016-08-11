@@ -21,4 +21,13 @@ class GeoIp extends Base {
 		'continent_code',
 	);
 
+	public function getRateForGeoipId($geoipId) {
+		$query = $this
+			->join('countries', 'countries.country_code', '=', 'tracker_geoip.country_code')
+			->join('tiers', 'tiers.id', '=', 'countries.tier_id')
+			->where('tracker_geoip.id', '=', $geoipId)
+			->select('tiers.rate');
+		return $query->first()->rate;
+	}
+
 }

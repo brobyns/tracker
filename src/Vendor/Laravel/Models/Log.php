@@ -174,18 +174,8 @@ class Log extends Base {
         $selectStatement = $this->createSelectStatementPageViewsByRouteName($uniqueOnly);
 
         $query = $this
-            ->join('tracker_route_paths', 'tracker_route_paths.id', '=', 'tracker_log.route_path_id')
             ->join('tracker_paths', 'tracker_paths.id', '=', 'tracker_log.path_id')
-            ->leftJoin(
-                'tracker_route_path_parameters',
-                'tracker_route_path_parameters.route_path_id',
-                '=',
-                'tracker_route_paths.id'
-            )
 
-            ->join('tracker_routes', 'tracker_routes.id', '=', 'tracker_route_paths.route_id')
-
-            ->where('tracker_routes.name', $name)
             ->where('tracker_paths.user_id', $userid)
             ->select(
                 $this->getConnection()->raw($selectStatement))
@@ -276,4 +266,17 @@ class Log extends Base {
         $countColumn = ($uniqueOnly) ? 'distinct(tracker_log.session_id)' : '*';
         return 'DATE(tracker_log.created_at) as date, count('. $countColumn .') as total';
     }
+
+	public function isIpUnique($userid, $clientIp) {
+		$query = $this
+			->join('tracker_paths', 'tracker_paths.id', '=', 'tracker_log.path_id')
+			->join('tracker_sessions', 'tracker_sessions.id', '=', 'tracker_log.session_id')
+			->where('tracker_paths.user_id', $userid)
+            ->where('tracker_sessions.client_ip', $clientIp)
+			->groupBy(
+				Log::getConnection()->raw('DATE(tracker_log.created_at)')
+			)
+			->today('tracker_sessions');
+		return $query->get()->isEmpty();
+	}
 }

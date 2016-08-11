@@ -2,6 +2,7 @@
 
 namespace PragmaRX\Tracker\Vendor\Laravel;
 
+use PragmaRX\Tracker\Data\Repositories\Earnings;
 use PragmaRX\Tracker\Tracker;
 use PragmaRX\Support\PhpSession;
 use PragmaRX\Support\GeoIp\GeoIp;
@@ -205,6 +206,8 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
 	        $systemClassModel = $this->instantiateModel('system_class_model');
 
+			$earningModel = $this->instantiateModel('earnings_model');
+
 	        $logRepository = new Log($logModel);
 
 	        $connectionRepository = new Connection($connectionModel);
@@ -312,7 +315,9 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
 	            $systemClassRepository,
 
-		        $crawlerDetect
+		        $crawlerDetect,
+
+				new Earnings($earningModel)
             );
         });
     }

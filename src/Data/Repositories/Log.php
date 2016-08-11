@@ -105,6 +105,10 @@ class Log extends Repository
 		return $this->getModel()->viewsAndEarningsForUser($userid, $minutes);
 	}
 
+	public function isIpUnique($userid, $clientIp) {
+		return $this->getModel()->isIpUnique($userid, $clientIp);
+	}
+
 	public function getErrors($minutes, $results)
 	{
 		return $this->getModel()->errors($minutes, $results);

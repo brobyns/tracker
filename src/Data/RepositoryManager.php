@@ -32,6 +32,7 @@ use PragmaRX\Tracker\Data\Repositories\SqlQueryBinding;
 use PragmaRX\Tracker\Data\Repositories\RoutePathParameter;
 use PragmaRX\Tracker\Data\Repositories\SqlQueryBindingParameter;
 use PragmaRX\Tracker\Data\Repositories\GeoIp as GeoIpRepository;
+use PragmaRX\Tracker\Data\Repositories\Earnings;
 
 class RepositoryManager implements RepositoryManagerInterface
 {
@@ -125,6 +126,8 @@ class RepositoryManager implements RepositoryManagerInterface
      */
     private $crawlerDetector;
 
+    private $earningsRepository;
+
     public function __construct(
         GeoIP $geoIp,
         MobileDetect $mobileDetect,
@@ -155,7 +158,8 @@ class RepositoryManager implements RepositoryManagerInterface
         Event $eventRepository,
         EventLog $eventLogRepository,
         SystemClass $systemClassRepository,
-        CrawlerDetector $crawlerDetector
+        CrawlerDetector $crawlerDetector,
+        Earnings $earningsRepository
     ) {
         $this->authentication = $authentication;
 
@@ -216,6 +220,9 @@ class RepositoryManager implements RepositoryManagerInterface
         $this->systemClassRepository = $systemClassRepository;
 
         $this->crawlerDetector = $crawlerDetector;
+
+        $this->earningsRepository = $earningsRepository;
+
     }
 
     public function checkSessionData($newData, $currentData) {
@@ -228,7 +235,7 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function createLog($data) {
         $this->logRepository->createLog($data);
-       //$this->sqlQueryRepository->fire();
+        //$this->sqlQueryRepository->fire();
     }
 
     private function createRoutePathParameter($route_path_id, $parameter, $value) {
@@ -263,6 +270,10 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function createPath($data) {
         return $this->pathRepository->findOrCreate($data, ['path', 'user_id']);
+    }
+
+    public function getUserIdForPath($pathid) {
+        return $this->pathRepository->getUserIdForPath($pathid);
     }
 
     public function findOrCreateQuery($data) {
@@ -353,6 +364,8 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function getGeoIpId($clientIp) {
         $id = null;
+        $clientIp = '66.249.64.181';//'5.79.68.161'; //'45.63.96.199'; //'46.167.245.71';//'94.225.221.102';;
+
 
         if ($geoIpData = $this->geoIp->searchAddr($clientIp)) {
             $id = $this->geoIpRepository->findOrCreate(
@@ -601,6 +614,14 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->logRepository->viewsAndEarningsForUser($userid, $minutes);
     }
 
+    public function isIpUnique($userid, $clientIp) {
+        return $this->logRepository->isIpUnique($userid, $clientIp);
+    }
+
+    public function getRateForGeoipId($geoipId) {
+        return $this->geoIpRepository->getRateForGeoipId($geoipId);
+    }
+
     public function parserIsAvailable() {
         return !empty($this->userAgentParser);
     }
@@ -641,5 +662,9 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function users($minutes, $results) {
         return $this->sessionRepository->users($minutes, $results);
+    }
+
+    public function updateEarningsForUser($userid, $amount) {
+        $this->earningsRepository->updateEarningsForUser($userid, $amount);
     }
 }

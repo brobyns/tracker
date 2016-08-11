@@ -259,6 +259,8 @@ return [
 
     'system_class_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\SystemClass',
 
+	'earnings_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Earnings',
+
 	/**
 	 * Laravel internal variables on user authentication and login.
 	 */

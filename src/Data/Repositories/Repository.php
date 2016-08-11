@@ -111,6 +111,30 @@ abstract class Repository implements RepositoryInterface {
         return  $model->id;
     }
 
+	public function updateOrCreate($attributes, $keys = null, &$created = false, $otherModel = null)
+	{
+		$model = $this->newQuery($otherModel);
+
+		$keys = $keys ?: array_keys($attributes);
+
+		foreach ($keys as $key)
+		{
+			$model = $model->where($key, $attributes[$key]);
+		}
+
+		if ( ! $model = $model->first())
+		{
+			$model = $this->create($attributes, $otherModel);
+
+			$created = true;
+		}
+
+		$model->save();
+		$this->model = $model;;
+
+		return  $model->id;
+	}
+
     public function getModel()
     {
     	if ($this->model instanceof Illuminate\Database\Eloquent\Builder)

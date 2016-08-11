@@ -2,6 +2,7 @@
 
 namespace PragmaRX\Tracker\Vendor\Laravel\Models;
 
+use Carbon\Carbon;
 use Symfony\Component\Console\Application;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
@@ -44,6 +45,15 @@ class Base extends Eloquent {
 		return $query
 				->where($alias.'updated_at', '>=', $minutes->getStart())
 				->where($alias.'updated_at', '<=', $minutes->getEnd());
+	}
+
+	public function scopeToday($query, $alias = '')
+	{
+		$alias = $alias ? "$alias." : '';
+
+		return $query
+			->where($alias.'updated_at', '>=', Carbon::now()->startOfDay())
+			->where($alias.'updated_at', '<=', Carbon::now()->endOfDay());
 	}
 
 }

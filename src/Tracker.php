@@ -2,6 +2,9 @@
 
 namespace PragmaRX\Tracker;
 
+use App\Earnings;
+use App\Http\Services\EarningsService;
+use Illuminate\Support\Facades\Auth;
 use PragmaRX\Support\Config;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
@@ -49,6 +52,7 @@ class Tracker
         $this->logger = $logger;
 
         $this->laravel = $laravel;
+
     }
 
     public function allSessions() {
@@ -348,6 +352,14 @@ class Tracker
         return $this->dataRepositoryManager->viewsAndEarningsForUser($userid, Minutes::make($minutes));
     }
 
+    public function isIpUnique($userid, $clientIp) {
+        return $this->dataRepositoryManager->isIpUnique($userid, $clientIp);
+    }
+
+    public function getRateForGeoipId($geoipId) {
+        return $this->dataRepositoryManager->getRateForGeoipId($geoipId);
+    }
+
     public function parserIsAvailable() {
         if (!$this->dataRepositoryManager->parserIsAvailable()) {
             $this->logger->error('Tracker: uaparser regex file not available. "Execute php artisan tracker:updateparser" to generate it.');
@@ -391,6 +403,14 @@ class Tracker
 
         if ($this->config->get('log_enabled')) {
             $this->dataRepositoryManager->createLog($log);
+
+            $userid = $this->dataRepositoryManager->getUserIdForPath($log['path_id']);
+            $clientIp = $this->request->getClientIp();
+
+            if ($this->isIpUnique($userid, '10.73.68.161')) {
+                $amount = $this->getRateForGeoipId($log['geoip_id']);
+                $this->dataRepositoryManager->updateEarningsForUser($userid, $amount);
+            }
         }
     }
 
