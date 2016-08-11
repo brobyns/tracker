@@ -364,8 +364,6 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function getGeoIpId($clientIp) {
         $id = null;
-        $clientIp = '66.249.64.181';//'5.79.68.161'; //'45.63.96.199'; //'46.167.245.71';//'94.225.221.102';;
-
 
         if ($geoIpData = $this->geoIp->searchAddr($clientIp)) {
             $id = $this->geoIpRepository->findOrCreate(
