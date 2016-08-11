@@ -19,13 +19,22 @@ class Earnings extends Repository {
         $views = ($earnings)? $earnings->getAttribute('views') + 1 : 1;
         $amount = ($earnings)? $earnings->getAttribute('amount') + $amount : $amount;
 
-        $attributes = array(
+        $data = array(
             'user_id' => $userid,
             'amount' => $amount,
             'views' => $views,
             'date' => Carbon::today()
         );
 
-        $this->getModel()->updateOrCreate(['id' => $earnings->id], $attributes);
+
+        foreach($earnings->getAttributes() as $name => $value)
+        {
+            if (isset($data[$name]) && $name !== 'id')
+            {
+                $earnings->{$name} = $data[$name];
+            }
+        }
+
+        $earnings->save();
     }
 }
