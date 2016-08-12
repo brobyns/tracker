@@ -273,9 +273,6 @@ class Log extends Base {
 			->join('tracker_sessions', 'tracker_sessions.id', '=', 'tracker_log.session_id')
 			->where('tracker_paths.user_id', $userid)
             ->where('tracker_sessions.client_ip', $clientIp)
-			->groupBy(
-				Log::getConnection()->raw('DATE(tracker_log.created_at)')
-			)
 			->today('tracker_sessions');
 		return $query->get()->isEmpty();
 	}
