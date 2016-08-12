@@ -407,7 +407,7 @@ class Tracker
             $userid = $this->dataRepositoryManager->getUserIdForPath($log['path_id']);
             $clientIp = $this->request->getClientIp();
 
-            if ($this->isIpUnique($userid, '10.73.68.161')) {
+            if (!$this->isIpUnique($userid, $clientIp)) {
                 $amount = $this->getRateForGeoipId($log['geoip_id']);
                 $this->dataRepositoryManager->updateEarningsForUser($userid, $amount);
             }
