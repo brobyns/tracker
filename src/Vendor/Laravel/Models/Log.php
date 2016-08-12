@@ -274,6 +274,6 @@ class Log extends Base {
 			->where('tracker_paths.user_id', $userid)
             ->where('tracker_sessions.client_ip', $clientIp)
 			->today('tracker_sessions');
-		return $query->count() == 1;
+		return $query->count() < 2;
 	}
 }
