@@ -3,7 +3,6 @@
 namespace PragmaRX\Tracker\Data;
 
 use PragmaRX\Support\Config;
-use PragmaRX\Support\GeoIp\GeoIp;
 use PragmaRX\Tracker\Data\Repositories\Balance;
 use PragmaRX\Tracker\Data\Repositories\Stats;
 use PragmaRX\Tracker\Data\Repositories\Tier;
