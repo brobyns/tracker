@@ -138,7 +138,7 @@ class RepositoryManager implements RepositoryManagerInterface
     private $tierRepository;
 
     public function __construct(
-        GeoIP $geoIp,
+        GeoIp $geoIp,
         MobileDetect $mobileDetect,
         $userAgentParser,
         Authentication $authentication,
