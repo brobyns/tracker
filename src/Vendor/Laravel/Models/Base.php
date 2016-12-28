@@ -56,4 +56,13 @@ class Base extends Eloquent {
 			->where($alias.'updated_at', '<=', Carbon::now()->endOfDay());
 	}
 
+	public function scopeLast10Days($query, $alias = '')
+	{
+		$alias = $alias ? "$alias." : '';
+
+		return $query
+			->where($alias.'updated_at', '>=', Carbon::now()->startOfDay()->subDays(10))
+			->where($alias.'updated_at', '<=', Carbon::now()->endOfDay());
+	}
+
 }

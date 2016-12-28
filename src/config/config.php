@@ -261,6 +261,12 @@ return [
 
 	'earnings_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Earnings',
 
+	'balance_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Balance',
+
+	'stats_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Stats',
+
+	'tier_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Tier',
+
 	/**
 	 * Laravel internal variables on user authentication and login.
 	 */

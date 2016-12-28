@@ -22,12 +22,17 @@ class GeoIp extends Base {
 	);
 
 	public function getRateForGeoipId($geoipId) {
-		$query = $this
+		$rate = $this
 			->join('countries', 'countries.country_code', '=', 'tracker_geoip.country_code')
 			->join('tiers', 'tiers.id', '=', 'countries.tier_id')
 			->where('tracker_geoip.id', '=', $geoipId)
-			->select('tiers.rate');
-		return $query->first()->rate;
+			->select('tiers.name', 'tiers.rate')->first();
+		if (!$rate) {
+			// unkown country, then take rate of Tier D
+			$rate = config('rates.tierD');
+
+		}
+		return $rate;
 	}
 
 }

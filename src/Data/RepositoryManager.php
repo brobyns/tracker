@@ -4,6 +4,9 @@ namespace PragmaRX\Tracker\Data;
 
 use PragmaRX\Support\Config;
 use PragmaRX\Support\GeoIp\GeoIp;
+use PragmaRX\Tracker\Data\Repositories\Balance;
+use PragmaRX\Tracker\Data\Repositories\Stats;
+use PragmaRX\Tracker\Data\Repositories\Tier;
 use PragmaRX\Tracker\Support\MobileDetect;
 use PragmaRX\Tracker\Data\Repositories\Log;
 use PragmaRX\Tracker\Data\Repositories\Path;
@@ -128,6 +131,12 @@ class RepositoryManager implements RepositoryManagerInterface
 
     private $earningsRepository;
 
+    private $balanceRepository;
+
+    private $statsRepository;
+
+    private $tierRepository;
+
     public function __construct(
         GeoIP $geoIp,
         MobileDetect $mobileDetect,
@@ -159,7 +168,10 @@ class RepositoryManager implements RepositoryManagerInterface
         EventLog $eventLogRepository,
         SystemClass $systemClassRepository,
         CrawlerDetector $crawlerDetector,
-        Earnings $earningsRepository
+        Earnings $earningsRepository,
+        Balance $balanceRepository,
+        Stats $statsRepository,
+        Tier $tierRepository
     ) {
         $this->authentication = $authentication;
 
@@ -223,6 +235,12 @@ class RepositoryManager implements RepositoryManagerInterface
 
         $this->earningsRepository = $earningsRepository;
 
+        $this->balanceRepository = $balanceRepository;
+
+        $this->statsRepository = $statsRepository;
+
+        $this->tierRepository = $tierRepository;
+
     }
 
     public function checkSessionData($newData, $currentData) {
@@ -269,11 +287,15 @@ class RepositoryManager implements RepositoryManagerInterface
     }
 
     public function createPath($data) {
-        return $this->pathRepository->findOrCreate($data, ['path', 'user_id']);
+        return $this->pathRepository->findOrCreate($data, ['path', 'user_id', 'image_id']);
     }
 
-    public function getUserIdForPath($pathid) {
-        return $this->pathRepository->getUserIdForPath($pathid);
+    public function getPath($pathid) {
+        return $this->pathRepository->getPath($pathid);
+    }
+
+    public function getTier($geoipId) {
+        return $this->tierRepository->getTier($geoipId);
     }
 
     public function findOrCreateQuery($data) {
@@ -373,6 +395,11 @@ class RepositoryManager implements RepositoryManagerInterface
         }
 
         return $id;
+    }
+
+    public function getTierId($geoipId) {
+       return $this->tierRepository->getId($geoipId);
+
     }
 
     public function getLastSessions($minutes, $results) {
@@ -568,7 +595,7 @@ class RepositoryManager implements RepositoryManagerInterface
     }
 
     public function logByRouteName($name, $minutes = null) {
-        return $this->logRepository->allByRouteName($name, $minutes);
+        return $this->logRepository->allByRouteName($name);
     }
 
     public function logEvents() {
@@ -592,24 +619,28 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->logRepository->pageViewsByCountry($minutes, $results);
     }
 
-    public function pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly) {
-        return $this->logRepository->pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly);
+    public function pageViewsByRouteName($userid, $uniqueOnly) {
+        return $this->logRepository->pageViewsByRouteName($userid, $uniqueOnly);
     }
 
-    public function referersForUser($userid, $minutes) {
-        return $this->logRepository->referersForUser($userid, $minutes);
+    public function referersForUser($userid) {
+        return $this->logRepository->referersForUser($userid);
     }
 
-    public function countriesForUser($userid, $minutes) {
-        return $this->logRepository->countriesForUser($userid, $minutes);
+    public function countriesForUser($userid) {
+        return $this->logRepository->countriesForUser($userid);
     }
 
-    public function tiersForUser($userid, $minutes) {
-        return $this->logRepository->tiersForUser($userid, $minutes);
+    public function tiersForUser($userid) {
+        return $this->logRepository->tiersForUser($userid);
     }
 
-    public function viewsAndEarningsForUser($userid, $minutes) {
-        return $this->logRepository->viewsAndEarningsForUser($userid, $minutes);
+    public function statsForUser($userId) {
+        return $this->statsRepository->statsForUser($userId);
+    }
+
+    public function viewsAndEarningsForUser($userid) {
+        return $this->logRepository->viewsAndEarningsForUser($userid);
     }
 
     public function isIpUnique($userid, $clientIp) {
@@ -662,7 +693,16 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->sessionRepository->users($minutes, $results);
     }
 
-    public function updateEarningsForUser($userid, $amount) {
-        $this->earningsRepository->updateEarningsForUser($userid, $amount);
+    public function updateEarningsForUser($userId, $tierId, $amount) {
+        $this->earningsRepository->updateEarningsForUser($userId, $tierId, $amount);
     }
+
+    public function updateBalanceForUser($userid, $amount) {
+        $this->balanceRepository->updateBalanceForUser($userid, $amount);
+    }
+
+    public function updateStatsForImage($imageId, $tierId, $amount) {
+        $this->statsRepository->updateStatsForImage($imageId, $tierId, $amount);
+    }
+
 }

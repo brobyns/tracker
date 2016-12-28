@@ -7,7 +7,7 @@ class Path extends Base {
 	protected $table = 'tracker_paths';
 
 	protected $fillable = array(
-		'path', 'user_id',
+		'path', 'user_id', 'image_id'
 	);
 
 }

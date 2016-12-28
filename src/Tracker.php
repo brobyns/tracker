@@ -119,7 +119,8 @@ class Tracker
 
     protected function getGeoIpId() {
         return $this->config->get('log_geoip')
-            ? $this->dataRepositoryManager->getGeoIpId($this->request->getClientIp())
+            ? //$this->dataRepositoryManager->getGeoIpId($this->request->getClientIp())
+            $this->dataRepositoryManager->getGeoIpId('93.210.15.68')
             : null;
     }
 
@@ -238,7 +239,7 @@ class Tracker
         return $this->config->get('enabled') &&
         $this->logIsEnabled() &&
         $this->parserIsAvailable() &&
-        $this->isTrackableIp() &&
+        //$this->isTrackableIp() &&
         $this->isTrackableEnvironment() &&
         $this->notRobotOrTrackable() &&
         $this->isTrackableRoute();
@@ -332,24 +333,28 @@ class Tracker
         return $this->dataRepositoryManager->pageViewsByCountry(Minutes::make($minutes), $results);
     }
 
-    public function pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly) {
-        return $this->dataRepositoryManager->pageViewsByRouteName($userid, Minutes::make($minutes), $name, $uniqueOnly);
+    public function pageViewsByRouteName($userid, $uniqueOnly) {
+        return $this->dataRepositoryManager->pageViewsByRouteName($userid, $uniqueOnly);
     }
 
-    public function referersForUser($userid, $minutes) {
-        return $this->dataRepositoryManager->referersForUser($userid, Minutes::make($minutes));
+    public function referersForUser($userid) {
+        return $this->dataRepositoryManager->referersForUser($userid);
     }
 
-    public function countriesForUser($userid, $minutes) {
-        return $this->dataRepositoryManager->countriesForUser($userid, Minutes::make($minutes));
+    public function countriesForUser($userid) {
+        return $this->dataRepositoryManager->countriesForUser($userid);
     }
 
-    public function tiersForUser($userid, $minutes) {
-        return $this->dataRepositoryManager->tiersForUser($userid, Minutes::make($minutes));
+    public function tiersForUser($userid) {
+        return $this->dataRepositoryManager->tiersForUser($userid);
     }
 
-    public function viewsAndEarningsForUser($userid, $minutes) {
-        return $this->dataRepositoryManager->viewsAndEarningsForUser($userid, Minutes::make($minutes));
+    public function statsForUser($userId) {
+        return $this->dataRepositoryManager->statsForUser($userId);
+    }
+
+    public function viewsAndEarningsForUser($userid) {
+        return $this->dataRepositoryManager->viewsAndEarningsForUser($userid);
     }
 
     public function isIpUnique($userid, $clientIp) {
@@ -404,12 +409,14 @@ class Tracker
         if ($this->config->get('log_enabled')) {
             $this->dataRepositoryManager->createLog($log);
 
-            $userid = $this->dataRepositoryManager->getUserIdForPath($log['path_id']);
-            $clientIp = $this->request->getClientIp();
-
-            if ($this->isIpUnique($userid, $clientIp)) {
-                $amount = $this->getRateForGeoipId($log['geoip_id']);
-                $this->dataRepositoryManager->updateEarningsForUser($userid, $amount);
+            $path = $this->dataRepositoryManager->getPath($log['path_id']);
+            $tier = $this->dataRepositoryManager->getTier($log['geoip_id']);
+            //$clientIp = $this->request->getClientIp();
+            $clientIp =  '93.210.15.68';
+            if ($this->isIpUnique($path->user_id, $clientIp)) {
+                $this->dataRepositoryManager->updateStatsForImage($path->image_id, $tier->id, $tier->rate);
+                //$this->dataRepositoryManager->updateEarningsForUser($path->user_id, $tier->id, $tier->rate);
+                $this->dataRepositoryManager->updateBalanceForUser($path->user_id, $tier->rate);
             }
         }
     }
@@ -438,11 +445,12 @@ class Tracker
         return $this->dataRepositoryManager->users(Minutes::make($minutes), $results);
     }
 
-    public function createPath($path, $userid) {
+    public function createPath($path, $userid, $imageId) {
         $this->dataRepositoryManager->createPath(
             [
                 'path' => $path,
                 'user_id' => $userid,
+                'image_id' => $imageId
             ]);
     }
 }

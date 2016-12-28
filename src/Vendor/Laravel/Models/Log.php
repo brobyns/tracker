@@ -2,6 +2,9 @@
 
 namespace PragmaRX\Tracker\Vendor\Laravel\Models;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 class Log extends Base {
 
 	protected $table = 'tracker_log';
@@ -127,49 +130,14 @@ class Log extends Base {
 
 		if ($minutes)
 		{
-			$result->period($minutes, 'tracker_log');
+			$result->last10Days('tracker_log');
 		}
 		return $result;
 	}
 
 	/* added for pageviews per route*/
-
-	public function pageViewsByRouteNameWithId($minutes, $name, $id, $uniqueOnly) {
-
-        $selectStatement = $this->createSelectStatementPageViewsByRouteName($uniqueOnly);
-
-		$query = $this
-			->join('tracker_route_paths', 'tracker_route_paths.id', '=', 'tracker_log.route_path_id')
-
-			->leftJoin(
-				'tracker_route_path_parameters',
-				'tracker_route_path_parameters.route_path_id',
-				'=',
-				'tracker_route_paths.id'
-			)
-
-			->join('tracker_routes', 'tracker_routes.id', '=', 'tracker_route_paths.route_id')
-
-			->where('tracker_routes.name', $name)
-			->where(function($query2) use ($id, $minutes)
-			{
-				$query2
-					->where('parameter', 'id')
-					->where('value', $id);
-
-			})
-            ->select(
-                    $this->getConnection()->raw($selectStatement))
-            ->groupBy(
-				Log::getConnection()->raw('DATE(tracker_log.created_at)')
-			)
-			->period($minutes, 'tracker_log')
-			->orderBy('date');
-
-			return $query->get();
-	}
-
-    public function pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly) {
+/*
+    public function pageViewsByRouteName($userid, $uniqueOnly) {
 
         $selectStatement = $this->createSelectStatementPageViewsByRouteName($uniqueOnly);
 
@@ -182,14 +150,33 @@ class Log extends Base {
             ->groupBy(
                 Log::getConnection()->raw('DATE(tracker_log.created_at)')
             )
-            ->period($minutes, 'tracker_log')
+			->last10Days('tracker_log')
             ->orderBy('date');
 		$sql = $query->toSql();
-
         return $query->get();
     }
+*/
+	public function pageViewsByRouteName($userid, $uniqueOnly) {
 
-	public function referersForUser($userid, $minutes) {
+		$results =  DB::select(
+			DB::raw("SELECT calendar.date as date, count(distinct(tracker_log.session_id)) as total
+					from tracker_log
+					inner join tracker_paths on tracker_paths.id = tracker_log.path_id
+					and `tracker_paths`.`user_id` = :userid
+					right join calendar ON DATE(tracker_log.created_at) = calendar.date
+					where calendar.date >= :minDate
+                          and calendar.date <= :maxDate
+                    group by date
+                    order by `date` asc")
+          	, array('userid' => $userid,
+					'minDate' => Carbon::now()->startOfDay()->subDays(10),
+					'maxDate' => Carbon::now()->endOfDay())
+
+      	);
+		return $results;
+	}
+
+	public function referersForUser($userid) {
 		$query = $this
             ->join('tracker_referers', 'tracker_referers.id', '=', 'tracker_log.referer_id')
             ->join('tracker_paths', 'tracker_paths.id', '=', 'tracker_log.path_id')
@@ -199,29 +186,30 @@ class Log extends Base {
             ->groupBy(
                 Log::getConnection()->raw('tracker_referers.host')
             )
-            ->period($minutes, 'tracker_log')
+			->last10Days('tracker_log')
             ->orderBy('count', 'desc');
 
         return $query->get();
 	}
 
-	public function countriesForUser($userid, $minutes) {
+	public function countriesForUser($userid) {
 		$query = $this
 			->join('tracker_geoip', 'tracker_geoip.id', '=', 'tracker_log.geoip_id')
 			->join('tracker_paths', 'tracker_paths.id', '=', 'tracker_log.path_id')
 			->where('tracker_paths.user_id', $userid)
 			->select(
-				$this->getConnection()->raw('tracker_geoip.country_code as code, count(*) as value'))
+				$this->getConnection()->raw('tracker_geoip.country_code as code,
+					tracker_geoip.country_name as name, count(*) as value'))
 			->groupBy(
 				Log::getConnection()->raw('tracker_geoip.country_code')
 			)
-			->period($minutes, 'tracker_log')
+			->last10Days('tracker_log')
             ->orderBy('value');
 
 		return $query->get();
 	}
 
-	public function viewsAndEarningsForUser($userid, $minutes) {
+	public function viewsAndEarningsForUser($userid) {
 		$query = $this
 			->join('tracker_geoip', 'tracker_geoip.id', '=', 'tracker_log.geoip_id')
 			->join('tracker_paths', 'tracker_paths.id', '=', 'tracker_log.path_id')
@@ -237,13 +225,14 @@ class Log extends Base {
 			->groupBy(
 				Log::getConnection()->raw('tiers.id')
 			)
-			->period($minutes, 'tracker_log')
+			->last10Days('tracker_log')
 			->orderBy('tiers.id');
+			$sql = $query->toSql();
 
 		return $query->get();
 	}
 
-	public function tiersForUser($userid, $minutes) {
+	public function tiersForUser($userid) {
 		$query = $this
 			->join('tracker_geoip', 'tracker_geoip.id', '=', 'tracker_log.geoip_id')
 			->join('tracker_paths', 'tracker_paths.id', '=', 'tracker_log.path_id')
@@ -256,17 +245,17 @@ class Log extends Base {
 			->groupBy(
 				Log::getConnection()->raw('tier')
 			)
-			->period($minutes, 'tracker_log')
+			->last10Days('tracker_log')
 			->orderBy('tiers.id');
 
 		return $query->get();
 	}
-
+/*
     private function createSelectStatementPageViewsByRouteName($uniqueOnly) {
         $countColumn = ($uniqueOnly) ? 'distinct(tracker_log.session_id)' : '*';
         return 'DATE(tracker_log.created_at) as date, count('. $countColumn .') as total';
     }
-
+*/
 	public function isIpUnique($userid, $clientIp) {
 		$query = $this
 			->join('tracker_paths', 'tracker_paths.id', '=', 'tracker_log.path_id')

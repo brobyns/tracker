@@ -11,9 +11,11 @@ class Earnings extends Repository {
         parent::__construct($model);
     }
 
-    public function updateEarningsForUser($userid, $amount)
+    public function updateEarningsForUser($userId, $tierId, $amount)
     {
-        $earnings = $this->newQuery()->where('user_id', $userid)
+        $earnings = $this->newQuery()
+            ->where('user_id', $userId)
+            ->where('tier_id', $tierId)
             ->where('date', Carbon::today())->first();
 
         if ($earnings) {
@@ -21,7 +23,8 @@ class Earnings extends Repository {
             $earnings->amount += $amount;
         } else {
             $earnings = $this->newModel();
-            $earnings->user_id = $userid;
+            $earnings->user_id = $userId;
+            $earnings->tier_id = $tierId;
             $earnings->views = 1;
             $earnings->amount = $amount;
             $earnings->date = Carbon::today();

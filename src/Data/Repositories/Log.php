@@ -83,26 +83,26 @@ class Log extends Repository
 		 return $this->getModel()->pageViewsByCountry($minutes, $results);
 	}
 
-    public function pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly)
+    public function pageViewsByRouteName($userid, $uniqueOnly)
     {
-        return $this->getModel()->pageViewsByRouteName($userid, $minutes, $name, $uniqueOnly);
+        return $this->getModel()->pageViewsByRouteName($userid, $uniqueOnly);
     }
 
-	public function referersForUser($userid, $minutes)
+	public function referersForUser($userid)
 	{
-		return $this->getModel()->referersForUser($userid, $minutes);
+		return $this->getModel()->referersForUser($userid);
 	}
 
-	public function countriesForUser($userid, $minutes) {
-		return $this->getModel()->countriesForUser($userid, $minutes);
+	public function countriesForUser($userid) {
+		return $this->getModel()->countriesForUser($userid);
 	}
 
-	public function tiersForUser($userid, $minutes) {
-		return $this->getModel()->tiersForUser($userid, $minutes);
+	public function tiersForUser($userid) {
+		return $this->getModel()->tiersForUser($userid);
 	}
 
-	public function viewsAndEarningsForUser($userid, $minutes) {
-		return $this->getModel()->viewsAndEarningsForUser($userid, $minutes);
+	public function viewsAndEarningsForUser($userid) {
+		return $this->getModel()->viewsAndEarningsForUser($userid);
 	}
 
 	public function isIpUnique($userid, $clientIp) {
@@ -114,9 +114,9 @@ class Log extends Repository
 		return $this->getModel()->errors($minutes, $results);
 	}
 
-	public function allByRouteName($name, $minutes = null)
+	public function allByRouteName($name)
 	{
-		return $this->getModel()->allByRouteName($name, $minutes);
+		return $this->getModel()->allByRouteName($name);
 	}
 
 	public function delete()

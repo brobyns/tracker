@@ -2,26 +2,24 @@
 /**
  * Created by PhpStorm.
  * User: bramr
- * Date: 9/08/2016
- * Time: 18:35
+ * Date: 12/09/2016
+ * Time: 18:24
  */
 
 namespace PragmaRX\Tracker\Vendor\Laravel\Models;
 
 
-class Earnings extends Base
+class Balance extends Base
 {
-    protected $table = 'earnings';
+    protected $table = 'balances';
 
     protected $fillable = array(
         'user_id',
-        'tier_id',
-        'amount',
-        'views',
-        'date',
+        'amount'
     );
 
     public function user(){
         return $this->belongsTo(User::class);
     }
+
 }
