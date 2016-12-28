@@ -3,6 +3,7 @@
 namespace PragmaRX\Tracker\Data;
 
 use PragmaRX\Support\Config;
+use PragmaRX\Support\GeoIp\GeoIp;
 use PragmaRX\Tracker\Data\Repositories\Balance;
 use PragmaRX\Tracker\Data\Repositories\Stats;
 use PragmaRX\Tracker\Data\Repositories\Tier;
@@ -33,7 +34,7 @@ use PragmaRX\Tracker\Data\Repositories\QueryArgument;
 use PragmaRX\Tracker\Data\Repositories\SqlQueryBinding;
 use PragmaRX\Tracker\Data\Repositories\RoutePathParameter;
 use PragmaRX\Tracker\Data\Repositories\SqlQueryBindingParameter;
-use PragmaRX\Tracker\Data\Repositories\GeoIp as GeoIpRepository;
+use PragmaRX\Tracker\Data\Repositories\GeoIpRepository;
 use PragmaRX\Tracker\Data\Repositories\Earnings;
 
 class RepositoryManager implements RepositoryManagerInterface
@@ -137,7 +138,7 @@ class RepositoryManager implements RepositoryManagerInterface
     private $tierRepository;
 
     public function __construct(
-        \PragmaRX\Support\GeoIp\GeoIP $geoIp,
+        GeoIP $geoIp,
         MobileDetect $mobileDetect,
         $userAgentParser,
         Authentication $authentication,
