@@ -36,7 +36,7 @@ use PragmaRX\Tracker\Data\Repositories\SqlQueryLog;
 use PragmaRX\Tracker\Data\Repositories\QueryArgument;
 use PragmaRX\Tracker\Data\Repositories\SqlQueryBinding;
 use PragmaRX\Tracker\Data\Repositories\RoutePathParameter;
-use PragmaRX\Tracker\Data\Repositories\GeoIpRepository as GeoIpRepository;
+use PragmaRX\Tracker\Data\Repositories\GeoIpRepository;
 use PragmaRX\Tracker\Data\Repositories\SqlQueryBindingParameter;
 use PragmaRX\Support\ServiceProvider as PragmaRXServiceProvider;
 use PragmaRX\Tracker\Vendor\Laravel\Artisan\Tables as TablesCommand;
@@ -261,7 +261,7 @@ class ServiceProvider extends PragmaRXServiceProvider {
 	        );
 
 	        return new RepositoryManager(
-	            new \PragmaRX\Support\GeoIp\Geoip(),
+	            new Geoip(),
 
 	            new MobileDetect,
 
