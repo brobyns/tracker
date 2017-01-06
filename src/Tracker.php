@@ -119,8 +119,7 @@ class Tracker
 
     protected function getGeoIpId() {
         return $this->config->get('log_geoip')
-            ? //$this->dataRepositoryManager->getGeoIpId($this->request->getClientIp())
-            $this->dataRepositoryManager->getGeoIpId('93.210.15.68')
+            ? $this->dataRepositoryManager->getGeoIpId($this->request->getClientIp())
             : null;
     }
 
@@ -411,11 +410,10 @@ class Tracker
 
             $path = $this->dataRepositoryManager->getPath($log['path_id']);
             $tier = $this->dataRepositoryManager->getTier($log['geoip_id']);
-            //$clientIp = $this->request->getClientIp();
-            $clientIp =  '93.210.15.68';
+            $clientIp = $this->request->getClientIp();
             if ($this->isIpUnique($path->user_id, $clientIp)) {
                 $this->dataRepositoryManager->updateStatsForImage($path->image_id, $tier->id, $tier->rate);
-                //$this->dataRepositoryManager->updateEarningsForUser($path->user_id, $tier->id, $tier->rate);
+                $this->dataRepositoryManager->updateEarningsForUser($path->user_id, $tier->id, $tier->rate);
                 $this->dataRepositoryManager->updateBalanceForUser($path->user_id, $tier->rate);
             }
         }

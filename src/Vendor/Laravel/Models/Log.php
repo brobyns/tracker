@@ -157,23 +157,23 @@ class Log extends Base {
     }
 */
 	public function pageViewsByRouteName($userid, $uniqueOnly) {
-
-		$results =  DB::select(
-			DB::raw("SELECT calendar.date as date, count(distinct(tracker_log.session_id)) as total
-					from tracker_log
-					inner join tracker_paths on tracker_paths.id = tracker_log.path_id
-					and `tracker_paths`.`user_id` = :userid
-					right join calendar ON DATE(tracker_log.created_at) = calendar.date
-					where calendar.date >= :minDate
-                          and calendar.date <= :maxDate
-                    group by date
-                    order by `date` asc")
-          	, array('userid' => $userid,
-					'minDate' => Carbon::now()->startOfDay()->subDays(10),
-					'maxDate' => Carbon::now()->endOfDay())
-
-      	);
-		return $results;
+		return $this
+			->join('tracker_paths', function($join) use ($userid) {
+				$join->on('tracker_paths.id', '=', 'tracker_log.path_id')
+					->where('tracker_paths.user_id', $userid);
+			})
+			->rightjoin('calendar', function($join) {
+				$join->on($this->getConnection()->raw('tracker_log.created_at'), '=', 'calendar.date');
+			})
+			->where('calendar.date', '>=', Carbon::now()->startOfDay()->subDays(10))
+			->where('calendar.date', '<=', Carbon::now()->endOfDay())
+			->select(
+				$this->getConnection()->raw('calendar.date as date, count(distinct(tracker_log.session_id)) as total'))
+			->groupBy(
+				Log::getConnection()->raw('date')
+			)
+			->orderBy('date', 'asc')
+			->get();
 	}
 
 	public function referersForUser($userid) {
