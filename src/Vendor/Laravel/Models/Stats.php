@@ -10,6 +10,7 @@ namespace PragmaRX\Tracker\Vendor\Laravel\Models;
 
 
 use App\Image;
+use Carbon\Carbon;
 
 class Stats extends Base
 {
@@ -44,13 +45,19 @@ class Stats extends Base
     public function statsForUser($userId) {
         $query = $this->newQuery()
             ->join('images', 'images.id', '=', 'stats.image_id')
-            ->join('users', 'users.id', '=', 'images.user_id')
-            ->where('user_id', $userId)
-            ->select($this->getConnection()->raw('date, tier_id as tier,
+            ->join('users', function($join) use ($userId) {
+                $join->on('users.id', '=', 'images.user_id')
+                    ->where('user_id', $userId);
+            })
+            ->rightjoin('calendar', function($join) {
+                $join->on('stats.date', '=', 'calendar.date');
+            })
+            ->select($this->getConnection()->raw('calendar.date, tier_id as tier,
 					SUM(stats.views) as views, SUM(stats.amount) / 100000 as earnings'))
-            ->groupBy($this->getConnection()->raw('date'))
-            ->groupBy($this->getConnection()->raw('tier'))
-            ->last10Days('stats');
+            ->groupBy('calendar.date')
+            ->groupBy('tier')
+            ->where('calendar.date', '>=', Carbon::now()->startOfDay()->subDays(10))
+            ->where('calendar.date', '<=', Carbon::now()->endOfDay());
 
         $result = $query->get();
 
@@ -69,6 +76,6 @@ class Stats extends Base
         return array(
             'statsPerDay' => $grouped,
             'totals' => [ 'views' => array($totalViewsA, $totalViewsB, $totalViewsC, $totalViewsD),
-                          'earnings' => array($totalEarningsA, $totalEarningsB, $totalEarningsC, $totalEarningsD, $totalEarnings)]);
+                'earnings' => array($totalEarningsA, $totalEarningsB, $totalEarningsC, $totalEarningsD, $totalEarnings)]);
     }
 }
