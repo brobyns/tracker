@@ -44,11 +44,11 @@ use PragmaRX\Tracker\Support\Exceptions\Handler as TrackerExceptionHandler;
 
 class ServiceProvider extends PragmaRXServiceProvider {
 
-	protected $packageVendor = 'pragmarx';
+    protected $packageVendor = 'pragmarx';
 
-	protected $packageName = 'tracker';
+    protected $packageName = 'tracker';
 
-	protected $packageNameCapitalized = 'Tracker';
+    protected $packageNameCapitalized = 'Tracker';
 
     /**
      * Indicates if loading of the provider is deferred.
@@ -57,27 +57,27 @@ class ServiceProvider extends PragmaRXServiceProvider {
      */
     protected $defer = false;
 
-	private $userChecked = false;
+    private $userChecked = false;
 
-	private $tracker;
+    private $tracker;
 
-	/**
+    /**
      * Bootstrap the application events.
      *
      * @return void
      */
     public function boot()
     {
-	    parent::boot();
+        parent::boot();
 
-	    if ($this->getConfig('enabled'))
-	    {
-		    $this->loadRoutes();
+        if ($this->getConfig('enabled'))
+        {
+            $this->loadRoutes();
 
-		    $this->registerErrorHandler();
+            $this->registerErrorHandler();
 
-		    //$this->bootTracker();
-	    }
+            //$this->bootTracker();
+        }
     }
 
     /**
@@ -87,32 +87,32 @@ class ServiceProvider extends PragmaRXServiceProvider {
      */
     public function register()
     {
-	    parent::register();
+        parent::register();
 
-	    if ($this->getConfig('enabled'))
-	    {
-		    $this->registerAuthentication();
+        if ($this->getConfig('enabled'))
+        {
+            $this->registerAuthentication();
 
-		    $this->registerRepositories();
+            $this->registerRepositories();
 
-		    $this->registerTracker();
+            $this->registerTracker();
 
-		    $this->registerTablesCommand();
+            $this->registerTablesCommand();
 
-		    $this->registerExecutionCallback();
+            $this->registerExecutionCallback();
 
-		    $this->registerUserCheckCallback();
+            $this->registerUserCheckCallback();
 
-		    $this->registerSqlQueryLogWatcher();
+            $this->registerSqlQueryLogWatcher();
 
-		    $this->registerGlobalEventLogger();
+            $this->registerGlobalEventLogger();
 
-		    $this->registerDatatables();
+            $this->registerDatatables();
 
-		    $this->registerGlobalViewComposers();
+            $this->registerGlobalViewComposers();
 
-		    $this->commands('tracker.tables.command');
-	    }
+            $this->commands('tracker.tables.command');
+        }
     }
 
     /**
@@ -133,24 +133,24 @@ class ServiceProvider extends PragmaRXServiceProvider {
      */
     private function registerTracker()
     {
-        $this->app['tracker'] = $this->app->share(function($app)
+        $this->app->singleton('tracker', function ($app)
         {
             $app['tracker.loaded'] = true;
 
             return new Tracker(
-                                    $app['tracker.config'],
-                                    $app['tracker.repositories'],
-                                    $app['request'],
-                                    $app['router'],
-                                    $app['log'],
-                                    $app
-                                );
+                $app['tracker.config'],
+                $app['tracker.repositories'],
+                $app['request'],
+                $app['router'],
+                $app['log'],
+                $app
+            );
         });
     }
 
     public function registerRepositories()
     {
-        $this->app['tracker.repositories'] = $this->app->share(function($app)
+        $this->app->singleton('tracker.repositories', function ($app)
         {
             try
             {
@@ -171,111 +171,111 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
             $cookieModel = $this->instantiateModel('cookie_model');
 
-	        $pathModel = $this->instantiateModel('path_model');
+            $pathModel = $this->instantiateModel('path_model');
 
-			$queryModel = $this->instantiateModel('query_model');
+            $queryModel = $this->instantiateModel('query_model');
 
-			$queryArgumentModel = $this->instantiateModel('query_argument_model');
+            $queryArgumentModel = $this->instantiateModel('query_argument_model');
 
-	        $domainModel = $this->instantiateModel('domain_model');
+            $domainModel = $this->instantiateModel('domain_model');
 
-	        $refererModel = $this->instantiateModel('referer_model');
+            $refererModel = $this->instantiateModel('referer_model');
 
-	        $refererSearchTermModel = $this->instantiateModel('referer_search_term_model');
+            $refererSearchTermModel = $this->instantiateModel('referer_search_term_model');
 
-	        $routeModel = $this->instantiateModel('route_model');
+            $routeModel = $this->instantiateModel('route_model');
 
-	        $routePathModel = $this->instantiateModel('route_path_model');
+            $routePathModel = $this->instantiateModel('route_path_model');
 
-	        $routePathParameterModel = $this->instantiateModel('route_path_parameter_model');
+            $routePathParameterModel = $this->instantiateModel('route_path_parameter_model');
 
-	        $errorModel = $this->instantiateModel('error_model');
+            $errorModel = $this->instantiateModel('error_model');
 
-	        $geoipModel = $this->instantiateModel('geoip_model');
+            $geoipModel = $this->instantiateModel('geoip_model');
 
-	        $sqlQueryModel = $this->instantiateModel('sql_query_model');
+            $sqlQueryModel = $this->instantiateModel('sql_query_model');
 
             $sqlQueryBindingModel = $this->instantiateModel('sql_query_binding_model');
 
-	        $sqlQueryBindingParameterModel = $this->instantiateModel('sql_query_binding_parameter_model');
+            $sqlQueryBindingParameterModel = $this->instantiateModel('sql_query_binding_parameter_model');
 
             $sqlQueryLogModel = $this->instantiateModel('sql_query_log_model');
 
-	        $connectionModel = $this->instantiateModel('connection_model');
+            $connectionModel = $this->instantiateModel('connection_model');
 
-	        $eventModel = $this->instantiateModel('event_model');
+            $eventModel = $this->instantiateModel('event_model');
 
-	        $eventLogModel = $this->instantiateModel('event_log_model');
+            $eventLogModel = $this->instantiateModel('event_log_model');
 
-	        $systemClassModel = $this->instantiateModel('system_class_model');
+            $systemClassModel = $this->instantiateModel('system_class_model');
 
-			$earningModel = $this->instantiateModel('earnings_model');
+            $earningModel = $this->instantiateModel('earnings_model');
 
-			$balanceModel = $this->instantiateModel('balance_model');
+            $balanceModel = $this->instantiateModel('balance_model');
 
-			$statsModel = $this->instantiateModel('stats_model');
+            $statsModel = $this->instantiateModel('stats_model');
 
-			$tierModel = $this->instantiateModel('tier_model');
+            $tierModel = $this->instantiateModel('tier_model');
 
-	        $logRepository = new Log($logModel);
+            $logRepository = new Log($logModel);
 
-	        $connectionRepository = new Connection($connectionModel);
+            $connectionRepository = new Connection($connectionModel);
 
-	        $sqlQueryBindingRepository = new SqlQueryBinding($sqlQueryBindingModel);
+            $sqlQueryBindingRepository = new SqlQueryBinding($sqlQueryBindingModel);
 
-	        $sqlQueryBindingParameterRepository = new SqlQueryBindingParameter($sqlQueryBindingParameterModel);
+            $sqlQueryBindingParameterRepository = new SqlQueryBindingParameter($sqlQueryBindingParameterModel);
 
-	        $sqlQueryLogRepository = new SqlQueryLog($sqlQueryLogModel);
+            $sqlQueryLogRepository = new SqlQueryLog($sqlQueryLogModel);
 
-	        $sqlQueryRepository = new SqlQuery(
-		        $sqlQueryModel,
-		        $sqlQueryLogRepository,
-		        $sqlQueryBindingRepository,
-		        $sqlQueryBindingParameterRepository,
-		        $connectionRepository,
-		        $logRepository,
-		        $app['tracker.config']
-	        );
+            $sqlQueryRepository = new SqlQuery(
+                $sqlQueryModel,
+                $sqlQueryLogRepository,
+                $sqlQueryBindingRepository,
+                $sqlQueryBindingParameterRepository,
+                $connectionRepository,
+                $logRepository,
+                $app['tracker.config']
+            );
 
-			$eventLogRepository = new EventLog($eventLogModel);
+            $eventLogRepository = new EventLog($eventLogModel);
 
-			$systemClassRepository = new SystemClass($systemClassModel);
+            $systemClassRepository = new SystemClass($systemClassModel);
 
-	        $eventRepository = new Event(
-		        $eventModel,
-		        $app['tracker.events'],
-		        $eventLogRepository,
-		        $systemClassRepository,
-		        $logRepository,
-		        $app['tracker.config']
-	        );
+            $eventRepository = new Event(
+                $eventModel,
+                $app['tracker.events'],
+                $eventLogRepository,
+                $systemClassRepository,
+                $logRepository,
+                $app['tracker.config']
+            );
 
-	        $routeRepository = new Route(
-		        $routeModel,
-		        $app['tracker.config']
-	        );
+            $routeRepository = new Route(
+                $routeModel,
+                $app['tracker.config']
+            );
 
-	        $crawlerDetect = new CrawlerDetector(
-		        $app['request']->headers->all(),
-		        $app['request']->server('HTTP_USER_AGENT')
-	        );
+            $crawlerDetect = new CrawlerDetector(
+                $app['request']->headers->all(),
+                $app['request']->server('HTTP_USER_AGENT')
+            );
 
-	        return new RepositoryManager(
-	            new Geoip(),
+            return new RepositoryManager(
+                new Geoip(),
 
-	            new MobileDetect,
+                new MobileDetect,
 
-	            $uaParser,
+                $uaParser,
 
-	            $app['tracker.authentication'],
+                $app['tracker.authentication'],
 
-	            $app['session.store'],
+                $app['session.store'],
 
-	            $app['tracker.config'],
+                $app['tracker.config'],
 
                 new Session($sessionModel,
-                            $app['tracker.config'],
-                            new PhpSession()),
+                    $app['tracker.config'],
+                    new PhpSession()),
 
                 $logRepository,
 
@@ -290,13 +290,18 @@ class ServiceProvider extends PragmaRXServiceProvider {
                 new Device($deviceModel),
 
                 new Cookie($cookieModel,
-                            $app['tracker.config'],
-                            $app['request'],
-                            $app['cookie']),
+                    $app['tracker.config'],
+                    $app['request'],
+                    $app['cookie']),
 
                 new Domain($domainModel),
 
-	            $app->make('\PragmaRX\Tracker\Data\Repositories\Referer', [$refererModel, $refererSearchTermModel, $this->getAppUrl()]),
+                new Referer(
+                    $refererModel,
+                    $refererSearchTermModel,
+                    $this->getAppUrl(),
+                    $app->make('PragmaRX\Tracker\Support\RefererParser')
+                ),
 
                 $routeRepository,
 
@@ -308,7 +313,7 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
                 new GeoIpRepository($geoipModel),
 
-				$sqlQueryRepository,
+                $sqlQueryRepository,
 
                 $sqlQueryBindingRepository,
 
@@ -316,95 +321,95 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
                 $sqlQueryLogRepository,
 
-	            $connectionRepository,
+                $connectionRepository,
 
-	            $eventRepository,
+                $eventRepository,
 
-	            $eventLogRepository,
+                $eventLogRepository,
 
-	            $systemClassRepository,
+                $systemClassRepository,
 
-		        $crawlerDetect,
+                $crawlerDetect,
 
-				new Earnings($earningModel),
+                new Earnings($earningModel),
 
-				new Balance($balanceModel),
+                new Balance($balanceModel),
 
-				new Stats($statsModel),
+                new Stats($statsModel),
 
-				new Tier($tierModel)
+                new Tier($tierModel)
             );
         });
     }
 
     public function registerAuthentication()
     {
-        $this->app['tracker.authentication'] = $this->app->share(function($app)
+        $this->app->singleton('tracker.authentication', function ($app)
         {
             return new Authentication($app['tracker.config'], $app);
         });
     }
 
-	private function registerTablesCommand()
-	{
-		$this->app['tracker.tables.command'] = $this->app->share(function($app)
-		{
-			return new TablesCommand();
-		});
-	}
+    private function registerTablesCommand()
+    {
+        $this->app->singleton('tracker.tables.command', function ($app)
+        {
+            return new TablesCommand();
+        });
+    }
 
-	private function registerExecutionCallback()
-	{
-		$me = $this;
+    private function registerExecutionCallback()
+    {
+        $me = $this;
 
-		$this->app['events']->listen('Illuminate\Routing\Events\RouteMatched', function($event) use ($me)
-		{
-			$me->getTracker()->routerMatched($me->getConfig('log_routes'));
-		});
-	}
+        $this->app['events']->listen('Illuminate\Routing\Events\RouteMatched', function($event) use ($me)
+        {
+            $me->getTracker()->routerMatched($me->getConfig('log_routes'));
+        });
+    }
 
-	private function registerErrorHandler()
-	{
-		if ($this->getConfig('log_exceptions'))
-		{
-			if (isLaravel5())
-			{
-				$illuminateHandler = 'Illuminate\Contracts\Debug\ExceptionHandler';
+    private function registerErrorHandler()
+    {
+        if ($this->getConfig('log_exceptions'))
+        {
+            if (isLaravel5())
+            {
+                $illuminateHandler = 'Illuminate\Contracts\Debug\ExceptionHandler';
 
-				$handler = new TrackerExceptionHandler(
-					$this->getTracker(),
-					$this->app[$illuminateHandler]
-				);
+                $handler = new TrackerExceptionHandler(
+                    $this->getTracker(),
+                    $this->app[$illuminateHandler]
+                );
 
-				// Replace original Illuminate Exception Handler by Tracker's
-				$this->app[$illuminateHandler] = $handler;
-			}
-			else
-			{
-				$me = $this;
+                // Replace original Illuminate Exception Handler by Tracker's
+                $this->app[$illuminateHandler] = $handler;
+            }
+            else
+            {
+                $me = $this;
 
-				$this->app->error(
-					function (\Exception $exception, $code) use ($me)
-					{
-						$me->app['tracker']->handleException($exception, $code);
-					}
-				);
-			}
-		}
-	}
+                $this->app->error(
+                    function (\Exception $exception, $code) use ($me)
+                    {
+                        $me->app['tracker']->handleException($exception, $code);
+                    }
+                );
+            }
+        }
+    }
 
-	private function instantiateModel($modelName)
-	{
-		$model = $this->getConfig($modelName);
+    private function instantiateModel($modelName)
+    {
+        $model = $this->getConfig($modelName);
 
-		if ( ! $model)
-		{
-			$message = "Tracker: Model not found for '$modelName'.";
+        if ( ! $model)
+        {
+            $message = "Tracker: Model not found for '$modelName'.";
 
-			$this->app['log']->error($message);
+            $this->app['log']->error($message);
 
-			throw new \Exception($message);
-		}
+            throw new \Exception($message);
+        }
 
         $model = new $model;
 
@@ -415,199 +420,199 @@ class ServiceProvider extends PragmaRXServiceProvider {
             $model->setConnection($connection);
         }
 
-		return $model;
-	}
+        return $model;
+    }
 
-	private function registerSqlQueryLogWatcher()
-	{
-		$me = $this;
+    private function registerSqlQueryLogWatcher()
+    {
+        $me = $this;
 
-		$this->app['events']->listen('Illuminate\Database\Events\ExecutedQuery', function($events) use ($me)
-		{
-			if ($me->getTracker()->isEnabled())
-			{
-				$me->getTracker()->logSqlQuery(
-					$events->sql, $events->bindings, $events->time, $events->name
-				);
-			}
-		});
-	}
+        $this->app['events']->listen('Illuminate\Database\Events\ExecutedQuery', function($events) use ($me)
+        {
+            if ($me->getTracker()->isEnabled())
+            {
+                $me->getTracker()->logSqlQuery(
+                    $events->sql, $events->bindings, $events->time, $events->name
+                );
+            }
+        });
+    }
 
-	private function registerGlobalEventLogger()
-	{
-		$me = $this;
+    private function registerGlobalEventLogger()
+    {
+        $me = $this;
 
-		$this->app['tracker.events'] = $this->app->share(function($app)
-		{
-			return new EventStorage();
-		});
+        $this->app->singleton('tracker.events', function ($app)
+        {
+            return new EventStorage();
+        });
 
-		$this->app['events']->listen('event.*', function($object = null) use ($me)
-		{
-			if ($me->app['tracker.events']->isOff())
-			{
-				return;
-			}
+        $this->app['events']->listen('event.*', function($object = null) use ($me)
+        {
+            if ($me->app['tracker.events']->isOff())
+            {
+                return;
+            }
 
-			// To avoid infinite recursion, event tracking while logging events
-			// must be turned off
-			$me->app['tracker.events']->turnOff();
+            // To avoid infinite recursion, event tracking while logging events
+            // must be turned off
+            $me->app['tracker.events']->turnOff();
 
-			// Log events even before application is ready
-			$me->app['tracker.events']->logEvent(
-				$me->app['events']->firing(),
-				$object
-			);
+            // Log events even before application is ready
+            //$me->app['tracker.events']->logEvent(
+            //	$me->app['events']->firing(),
+            //	$object
+            //);
 
-			// Can only send events to database after application is ready
-			if (isset($me->app['tracker.loaded']))
-			{
-				$me->getTracker()->logEvents();
-			}
+            // Can only send events to database after application is ready
+            if (isset($me->app['tracker.loaded']))
+            {
+                $me->getTracker()->logEvents();
+            }
 
-			// Turn the event tracking to on again
-			$me->app['tracker.events']->turnOn();
-		});
+            // Turn the event tracking to on again
+            $me->app['tracker.events']->turnOn();
+        });
 
-	}
+    }
 
-	private function loadRoutes()
-	{
-		if (!$this->getConfig('stats_panel_enabled'))
-		{
-			return false;
-		}
+    private function loadRoutes()
+    {
+        if (!$this->getConfig('stats_panel_enabled'))
+        {
+            return false;
+        }
 
-		$prefix = $this->getConfig('stats_base_uri');
+        $prefix = $this->getConfig('stats_base_uri');
 
-		$namespace = $this->getConfig('stats_controllers_namespace');
+        $namespace = $this->getConfig('stats_controllers_namespace');
 
-		$filters = [];
+        $filters = [];
 
-		if ($before = $this->getConfig('stats_routes_before_filter'))
-		{
-			$filters['before'] = $before;
-		}
+        if ($before = $this->getConfig('stats_routes_before_filter'))
+        {
+            $filters['before'] = $before;
+        }
 
-		if ($after = $this->getConfig('stats_routes_after_filter'))
-		{
-			$filters['after'] = $after;
-		}
+        if ($after = $this->getConfig('stats_routes_after_filter'))
+        {
+            $filters['after'] = $after;
+        }
 
-		if ($middleware = $this->getConfig('stats_routes_middleware'))
-		{
-			$filters['middleware'] = $middleware;
-		}
+        if ($middleware = $this->getConfig('stats_routes_middleware'))
+        {
+            $filters['middleware'] = $middleware;
+        }
 
-		$router = $this->app->make('router');
+        $router = $this->app->make('router');
 
-		$router->group(['namespace' => $namespace], function() use ($prefix, $router, $filters)
-		{
-			$router->group($filters, function() use ($prefix, $router)
-			{
-				$router->group(['prefix' => $prefix], function($router)
-				{
-					$router->get('/', array('as' => 'tracker.stats.index', 'uses' => 'Stats@index'));
+        $router->group(['namespace' => $namespace], function() use ($prefix, $router, $filters)
+        {
+            $router->group($filters, function() use ($prefix, $router)
+            {
+                $router->group(['prefix' => $prefix], function($router)
+                {
+                    $router->get('/', array('as' => 'tracker.stats.index', 'uses' => 'Stats@index'));
 
-					$router->get('log/{uuid}', array('as' => 'tracker.stats.log', 'uses' => 'Stats@log'));
+                    $router->get('log/{uuid}', array('as' => 'tracker.stats.log', 'uses' => 'Stats@log'));
 
-					$router->get('api/pageviews', array('as' => 'tracker.stats.api.pageviews', 'uses' => 'Stats@apiPageviews'));
+                    $router->get('api/pageviews', array('as' => 'tracker.stats.api.pageviews', 'uses' => 'Stats@apiPageviews'));
 
-					$router->get('api/pageviewsbycountry', array('as' => 'tracker.stats.api.pageviewsbycountry', 'uses' => 'Stats@apiPageviewsByCountry'));
+                    $router->get('api/pageviewsbycountry', array('as' => 'tracker.stats.api.pageviewsbycountry', 'uses' => 'Stats@apiPageviewsByCountry'));
 
-					$router->get('api/log/{uuid}', array('as' => 'tracker.stats.api.log', 'uses' => 'Stats@apiLog'));
+                    $router->get('api/log/{uuid}', array('as' => 'tracker.stats.api.log', 'uses' => 'Stats@apiLog'));
 
-					$router->get('api/errors', array('as' => 'tracker.stats.api.errors', 'uses' => 'Stats@apiErrors'));
+                    $router->get('api/errors', array('as' => 'tracker.stats.api.errors', 'uses' => 'Stats@apiErrors'));
 
-					$router->get('api/events', array('as' => 'tracker.stats.api.events', 'uses' => 'Stats@apiEvents'));
+                    $router->get('api/events', array('as' => 'tracker.stats.api.events', 'uses' => 'Stats@apiEvents'));
 
-					$router->get('api/users', array('as' => 'tracker.stats.api.users', 'uses' => 'Stats@apiUsers'));
+                    $router->get('api/users', array('as' => 'tracker.stats.api.users', 'uses' => 'Stats@apiUsers'));
 
-					$router->get('api/visits', array('as' => 'tracker.stats.api.visits', 'uses' => 'Stats@apiVisits'));
-				});
-			});
-		});
-	}
+                    $router->get('api/visits', array('as' => 'tracker.stats.api.visits', 'uses' => 'Stats@apiVisits'));
+                });
+            });
+        });
+    }
 
-	private function registerDatatables()
-	{
-		$this->registerServiceProvider('Bllim\Datatables\DatatablesServiceProvider');
+    private function registerDatatables()
+    {
+        $this->registerServiceProvider('Bllim\Datatables\DatatablesServiceProvider');
 
-		$this->registerServiceAlias('Datatable', 'Bllim\Datatables\Facade\Datatables');
-	}
+        $this->registerServiceAlias('Datatable', 'Bllim\Datatables\Facade\Datatables');
+    }
 
-	/**
-	 * Get the current package directory.
-	 *
-	 * @return string
-	 */
-	public function getPackageDir()
-	{
-		return __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..';
-	}
+    /**
+     * Get the current package directory.
+     *
+     * @return string
+     */
+    public function getPackageDir()
+    {
+        return __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..';
+    }
 
-	/**
-	 * Boot & Track
-	 *
-	 */
-	private function bootTracker()
-	{
-		$this->getTracker()->boot();
-	}
+    /**
+     * Boot & Track
+     *
+     */
+    private function bootTracker()
+    {
+        $this->getTracker()->boot();
+    }
 
-	/**
-	 * Register global view composers
-	 *
-	 */
-	private function registerGlobalViewComposers()
-	{
-		$me = $this;
+    /**
+     * Register global view composers
+     *
+     */
+    private function registerGlobalViewComposers()
+    {
+        $me = $this;
 
-		$this->app->make('view')->composer('pragmarx/tracker::*', function($view) use ($me)
-		{
-			$view->with('stats_layout', $me->getConfig('stats_layout'));
+        $this->app->make('view')->composer('pragmarx/tracker::*', function($view) use ($me)
+        {
+            $view->with('stats_layout', $me->getConfig('stats_layout'));
 
-			$template_path = url('/') . $me->getConfig('stats_template_path');
+            $template_path = url('/') . $me->getConfig('stats_template_path');
 
-			$view->with('stats_template_path', $template_path);
-		});
-	}
+            $view->with('stats_template_path', $template_path);
+        });
+    }
 
-	private function registerUserCheckCallback()
-	{
-		$me = $this;
+    private function registerUserCheckCallback()
+    {
+        $me = $this;
 
-		$this->app['events']->listen('router.before', function($object = null) use ($me)
-		{
-			if ($me->tracker &&
-				! $me->userChecked &&
-				$me->getConfig('log_users') &&
-				$me->app->resolved($me->getConfig('authentication_ioc_binding'))
-			)
-			{
-				$me->userChecked = $me->getTracker()->checkCurrentUser();
-			}
-		});
-	}
+        $this->app['events']->listen('router.before', function($object = null) use ($me)
+        {
+            if ($me->tracker &&
+                ! $me->userChecked &&
+                $me->getConfig('log_users') &&
+                $me->app->resolved($me->getConfig('authentication_ioc_binding'))
+            )
+            {
+                $me->userChecked = $me->getTracker()->checkCurrentUser();
+            }
+        });
+    }
 
-	public function getTracker()
-	{
-		if ( ! $this->tracker)
-		{
-			$this->tracker = $this->app['tracker'];
-		}
+    public function getTracker()
+    {
+        if ( ! $this->tracker)
+        {
+            $this->tracker = $this->app['tracker'];
+        }
 
-		return $this->tracker;
-	}
+        return $this->tracker;
+    }
 
-	public function getRootDirectory()
-	{
-		return __DIR__.'/../..';
-	}
+    public function getRootDirectory()
+    {
+        return __DIR__.'/../..';
+    }
 
-	private function getAppUrl()
-	{
-		return $this->app['request']->url();
-	}
+    private function getAppUrl()
+    {
+        return $this->app['request']->url();
+    }
 
 }
