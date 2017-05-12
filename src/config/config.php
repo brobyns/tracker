@@ -171,11 +171,6 @@ return [
 	'log_paths' => false,
 
 	/**
-	 * Do you wish to log url queries and query arguments?
-	 */
-	'log_queries' => false,
-
-	/**
 	 * Do you wish to log routes and route parameters?
 	 */
 	'log_routes' => false,
@@ -217,10 +212,6 @@ return [
 
     'path_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Path',
 
-    'query_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Query',
-
-    'query_argument_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\QueryArgument',
-
     'agent_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Agent',
 
     'device_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Device',
@@ -237,25 +228,9 @@ return [
 
     'route_path_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\RoutePath',
 
-    'route_path_parameter_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\RoutePathParameter',
-
-    'error_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Error',
-
     'geoip_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\GeoIp',
 
-    'sql_query_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\SqlQuery',
-
-    'sql_query_binding_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\SqlQueryBinding',
-
-    'sql_query_binding_parameter_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\SqlQueryBindingParameter',
-
-    'sql_query_log_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\SqlQueryLog',
-
     'connection_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Connection',
-
-    'event_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Event',
-
-    'event_log_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\EventLog',
 
     'system_class_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\SystemClass',
 
@@ -281,49 +256,6 @@ return [
     'authenticated_user_username_column' => 'email', // to Auth::user()->email
 
 	/**
-	 * Enable the Stats Panel?
-	 */
-	'stats_panel_enabled' => false,
-
-	/**
-	 * Stats Panel routes before filter
-	 *
-	 */
-	'stats_routes_before_filter' => '',
-
-	/**
-	 * Stats Panel routes after filter
-	 *
-	 */
-	'stats_routes_after_filter' => '',
-
-	/**
-	 * Stats Panel routes middleware
-	 *
-	 */
-	'stats_routes_middleware' => '',
-
-	/**
-     * Stats Panel template path
-     */
-    'stats_template_path' => '/templates/sb-admin-2',
-
-    /**
-     * Stats Panel base uri.
-     *
-     * If your site url is http://wwww.mysite.com, then your stats page will be:
-     *
-     *    http://wwww.mysite.com/stats
-     *
-     */
-    'stats_base_uri' => 'stats',
-
-    /**
-     * Stats Panel layout view
-     */
-    'stats_layout' => 'pragmarx/tracker::layout',
-
-    /**
      * Stats Panel controllers namespace
      */
     'stats_controllers_namespace' => 'PragmaRX\Tracker\Vendor\Laravel\Controllers',

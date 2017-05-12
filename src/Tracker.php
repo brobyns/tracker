@@ -55,13 +55,6 @@ class Tracker
         return $this->dataRepositoryManager->getAllSessions();
     }
 
-    public function boot()
-    {
-        if ($this->isTrackable()) {
-            $this->track();
-        }
-    }
-
     public function checkCurrentUser()
     {
         if (!$this->getSessionData()['user_id'] && $user_id = $this->getUserId()) {
@@ -79,16 +72,6 @@ class Tracker
     protected function deleteCurrentLog()
     {
         $this->dataRepositoryManager->logRepository->delete();
-    }
-
-    public function errors($minutes, $results = true)
-    {
-        return $this->dataRepositoryManager->errors(Minutes::make($minutes), $results);
-    }
-
-    public function events($minutes, $results = true)
-    {
-        return $this->dataRepositoryManager->events(Minutes::make($minutes), $results);
     }
 
     protected function getAgentId()
@@ -140,13 +123,10 @@ class Tracker
             'method'     => $this->request->method(),
             'path_id'    => $this->getPathId(),
             'route_path_id' => $this->getRoutePathId(),
-            'query_id'   => $this->getQueryId(),
             'referer_id' => $this->getRefererId(),
-            'is_ajax'    => $this->request->ajax(),
-            'is_secure'  => $this->request->isSecure(),
-            'is_json'    => $this->request->isJson(),
-            'wants_json' => $this->request->wantsJson(),
             'geoip_id' => $this->getGeoIpId(),
+            'is_adblock' => $this->request->get('isAdblock'),
+            'is_real' => $this->request->get('isReal')
         ];
     }
 
@@ -159,20 +139,6 @@ class Tracker
                 ]
             )
             : null;
-    }
-
-    public function getQueryId()
-    {
-        if ($this->config->get('log_queries')) {
-            if (count($arguments = $this->request->query())) {
-                return $this->dataRepositoryManager->getQueryId(
-                    [
-                        'query'     => array_implode('=', '|', $arguments),
-                        'arguments' => $arguments,
-                    ]
-                );
-            }
-        }
     }
 
     protected function getRefererId()
@@ -248,41 +214,6 @@ class Tracker
         return $this->dataRepositoryManager->isRobot();
     }
 
-    protected function isSqlQueriesLoggableConnection($name)
-    {
-        return !in_array(
-            $name,
-            $this->config->get('do_not_log_sql_queries_connections')
-        );
-    }
-
-    protected function isTrackable()
-    {
-        return $this->config->get('enabled') &&
-            $this->logIsEnabled() &&
-            $this->parserIsAvailable() &&
-            $this->isTrackableIp() &&
-            $this->isTrackableEnvironment() &&
-            $this->routeIsTrackable() &&
-            $this->notRobotOrTrackable();
-    }
-
-    protected function isTrackableEnvironment()
-    {
-        return !in_array(
-            $this->laravel->environment(),
-            $this->config->get('do_not_track_environments')
-        );
-    }
-
-    protected function isTrackableIp()
-    {
-        return !ipv4_in_range(
-            $this->request->getClientIp(),
-            $this->config->get('do_not_track_ips')
-        );
-    }
-
     public function logByRouteName($name, $minutes = null)
     {
         if ($minutes) {
@@ -290,48 +221,6 @@ class Tracker
         }
 
         return $this->dataRepositoryManager->logByRouteName($name, $minutes);
-    }
-
-    public function logEvents()
-    {
-        if (
-            $this->isTrackable() &&
-            $this->config->get('log_enabled') &&
-            $this->config->get('log_events')
-        ) {
-            $this->dataRepositoryManager->logEvents();
-        }
-    }
-
-    protected function logIsEnabled()
-    {
-        return
-            $this->config->get('log_enabled') ||
-            $this->config->get('log_sql_queries') ||
-            $this->config->get('log_sql_queries_bindings') ||
-            $this->config->get('log_events') ||
-            $this->config->get('log_geoip') ||
-            $this->config->get('log_user_agents') ||
-            $this->config->get('log_users') ||
-            $this->config->get('log_devices') ||
-            $this->config->get('log_languages') ||
-            $this->config->get('log_referers') ||
-            $this->config->get('log_paths') ||
-            $this->config->get('log_queries') ||
-            $this->config->get('log_routes') ||
-            $this->config->get('log_exceptions');
-    }
-
-    public function logSqlQuery($query, $bindings, $time, $name)
-    {
-        if (
-            $this->isTrackable() &&
-            $this->config->get('log_enabled') &&
-            $this->config->get('log_sql_queries') &&
-            $this->isSqlQueriesLoggableConnection($name)
-        ) {
-            $this->dataRepositoryManager->logSqlQuery($query, $bindings, $time, $name);
-        }
     }
 
     protected function notRobotOrTrackable()
@@ -383,25 +272,6 @@ class Tracker
         return $this->dataRepositoryManager->getRateForGeoipId($geoipId);
     }
 
-    public function parserIsAvailable() {
-        if (!$this->dataRepositoryManager->parserIsAvailable()) {
-            $this->logger->error(trans('tracker::tracker.regex_file_not_available'));
-
-            return false;
-        }
-
-        return true;
-    }
-
-    private function routeIsTrackable()
-    {
-        if (!$this->route) {
-            return false;
-        }
-
-        return $this->dataRepositoryManager->routeIsTrackable($this->route);
-    }
-
     public function routerMatched($log)
     {
         if ($this->dataRepositoryManager->routeIsTrackable($this->route)) {
@@ -447,18 +317,14 @@ class Tracker
 
             $path = $this->dataRepositoryManager->getPath($log['path_id']);
             $tier = $this->dataRepositoryManager->getTier($log['geoip_id']);
-            $clientIp = $this->request->getClientIp();
+            //$clientIp = $this->request->getClientIp();
+            $clientIp = '37.59.40.14';
             if ($this->isIpUnique($path->user_id, $clientIp)) {
                 $this->dataRepositoryManager->updateStatsForImage($path->image_id, $tier->id, $tier->rate);
                 $this->dataRepositoryManager->updateEarningsForUser($path->user_id, $tier->id, $tier->rate);
                 $this->dataRepositoryManager->updateBalanceForUser($path->user_id, $tier->rate);
             }
         }
-    }
-
-    public function trackEvent($event)
-    {
-        $this->dataRepositoryManager->trackEvent($event);
     }
 
     public function trackVisit($route, $request)

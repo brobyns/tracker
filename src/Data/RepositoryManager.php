@@ -10,30 +10,20 @@ use PragmaRX\Tracker\Data\Repositories\Tier;
 use PragmaRX\Tracker\Support\MobileDetect;
 use PragmaRX\Tracker\Data\Repositories\Log;
 use PragmaRX\Tracker\Data\Repositories\Path;
-use PragmaRX\Tracker\Data\Repositories\Query;
 use PragmaRX\Tracker\Data\Repositories\Agent;
 use PragmaRX\Tracker\Services\Authentication;
 use PragmaRX\Tracker\Data\Repositories\Route;
-use PragmaRX\Tracker\Data\Repositories\Event;
 use PragmaRX\Tracker\Support\CrawlerDetector;
-use PragmaRX\Tracker\Data\Repositories\Error;
 use PragmaRX\Tracker\Data\Repositories\Device;
 use PragmaRX\Tracker\Data\Repositories\Cookie;
 use PragmaRX\Tracker\Data\Repositories\Domain;
 use PragmaRX\Tracker\Data\Repositories\Referer;
 use PragmaRX\Tracker\Data\Repositories\Session;
-use PragmaRX\Tracker\Data\Repositories\EventLog;
-use PragmaRX\Tracker\Data\Repositories\SqlQuery;
 use PragmaRX\Tracker\Data\Repositories\RoutePath;
 use Illuminate\Routing\Router as IlluminateRouter;
 use Illuminate\Session\Store as IlluminateSession;
 use PragmaRX\Tracker\Data\Repositories\Connection;
-use PragmaRX\Tracker\Data\Repositories\SqlQueryLog;
 use PragmaRX\Tracker\Data\Repositories\SystemClass;
-use PragmaRX\Tracker\Data\Repositories\QueryArgument;
-use PragmaRX\Tracker\Data\Repositories\SqlQueryBinding;
-use PragmaRX\Tracker\Data\Repositories\RoutePathParameter;
-use PragmaRX\Tracker\Data\Repositories\SqlQueryBindingParameter;
 use PragmaRX\Tracker\Data\Repositories\GeoIpRepository;
 use PragmaRX\Tracker\Data\Repositories\Earnings;
 
@@ -43,17 +33,6 @@ class RepositoryManager implements RepositoryManagerInterface
      * @var Path
      */
     private $pathRepository;
-
-    /**
-     * @var Query
-     */
-
-    private $queryRepository;
-    /**
-     * @var QueryArgument
-     */
-
-    private $queryArgumentRepository;
     /**
      * @var Domain
      */
@@ -71,14 +50,6 @@ class RepositoryManager implements RepositoryManagerInterface
      */
     private $routePathRepository;
     /**
-     * @var Repositories\RoutePathParameter
-     */
-    private $routePathParameterRepository;
-    /**
-     * @var Error
-     */
-    private $errorRepository;
-    /**
      * @var GeoIP
      */
     private $geoIp;
@@ -86,36 +57,9 @@ class RepositoryManager implements RepositoryManagerInterface
     private $geoIpRepository;
 
     /**
-     * @var Repositories\SqlQuery
-     */
-    private $sqlQueryRepository;
-
-    /**
-     * @var Repositories\SqlQueryBinding
-     */
-    private $sqlQueryBindingRepository;
-
-    /**
-     * @var Repositories\SqlQueryLog
-     */
-    private $sqlQueryLogRepository;
-
-    private $sqlQueryBindingParameterRepository;
-
-    /**
      * @var Repositories\Connection
      */
     private $connectionRepository;
-
-    /**
-     * @var Repositories\Event
-     */
-    private $eventRepository;
-
-    /**
-     * @var Repositories\EventLog
-     */
-    private $eventLogRepository;
 
     /**
      * @var Repositories\SystemClass
@@ -147,8 +91,6 @@ class RepositoryManager implements RepositoryManagerInterface
         Session $sessionRepository,
         Log $logRepository,
         Path $pathRepository,
-        Query $queryRepository,
-        QueryArgument $queryArgumentRepository,
         Agent $agentRepository,
         Device $deviceRepository,
         Cookie $cookieRepository,
@@ -156,16 +98,8 @@ class RepositoryManager implements RepositoryManagerInterface
         Referer $refererRepository,
         Route $routeRepository,
         RoutePath $routePathRepository,
-        RoutePathParameter $routePathParameterRepository,
-        Error $errorRepository,
         GeoIpRepository $geoIpRepository,
-        SqlQuery $sqlQueryRepository,
-        SqlQueryBinding $sqlQueryBindingRepository,
-        SqlQueryBindingParameter $sqlQueryBindingParameterRepository,
-        SqlQueryLog $sqlQueryLogRepository,
         Connection $connectionRepository,
-        Event $eventRepository,
-        EventLog $eventLogRepository,
         SystemClass $systemClassRepository,
         CrawlerDetector $crawlerDetector,
         Earnings $earningsRepository,
@@ -191,10 +125,6 @@ class RepositoryManager implements RepositoryManagerInterface
 
         $this->pathRepository = $pathRepository;
 
-        $this->queryRepository = $queryRepository;
-
-        $this->queryArgumentRepository = $queryArgumentRepository;
-
         $this->agentRepository = $agentRepository;
 
         $this->deviceRepository = $deviceRepository;
@@ -209,25 +139,9 @@ class RepositoryManager implements RepositoryManagerInterface
 
         $this->routePathRepository = $routePathRepository;
 
-        $this->routePathParameterRepository = $routePathParameterRepository;
-
-        $this->errorRepository = $errorRepository;
-
         $this->geoIpRepository = $geoIpRepository;
 
-        $this->sqlQueryRepository = $sqlQueryRepository;
-
-        $this->sqlQueryBindingRepository = $sqlQueryBindingRepository;
-
-        $this->sqlQueryBindingParameterRepository = $sqlQueryBindingParameterRepository;
-
-        $this->sqlQueryLogRepository = $sqlQueryLogRepository;
-
         $this->connectionRepository = $connectionRepository;
-
-        $this->eventRepository = $eventRepository;
-
-        $this->eventLogRepository = $eventLogRepository;
 
         $this->systemClassRepository = $systemClassRepository;
 
@@ -253,25 +167,6 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function createLog($data) {
         $this->logRepository->createLog($data);
-        //$this->sqlQueryRepository->fire();
-    }
-
-    private function createRoutePathParameter($route_path_id, $parameter, $value) {
-        return $this->routePathParameterRepository->create(
-            [
-                'route_path_id' => $route_path_id,
-                'parameter'     => $parameter,
-                'value'         => $value,
-            ]
-        );
-    }
-
-    public function errors($minutes, $results) {
-        return $this->logRepository->getErrors($minutes, $results);
-    }
-
-    public function events($minutes, $results) {
-        return $this->eventRepository->getAll($minutes, $results);
     }
 
     public function findOrCreateAgent($data) {
@@ -296,28 +191,6 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function getTier($geoipId) {
         return $this->tierRepository->getTier($geoipId);
-    }
-
-    public function findOrCreateQuery($data) {
-        $id = $this->queryRepository->findOrCreate($data, ['query'], $created);
-
-        if ($created) {
-            foreach ($data['arguments'] as $argument => $value) {
-                if (is_array($value)) {
-                    $value = multi_implode(',', $value);
-                }
-
-                $this->queryArgumentRepository->create(
-                    [
-                        'query_id' => $id,
-                        'argument' => $argument,
-                        'value'    => $value,
-                    ]
-                );
-            }
-        }
-
-        return $id;
     }
 
     public function findOrCreateSession($data) {
@@ -386,7 +259,7 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function getGeoIpId($clientIp) {
         $id = null;
-
+        $clientIp = '138.68.132.212';
         if ($geoIpData = $this->geoIp->searchAddr($clientIp)) {
             $id = $this->geoIpRepository->findOrCreate(
                 $geoIpData,
@@ -428,14 +301,6 @@ class RepositoryManager implements RepositoryManagerInterface
         catch (\Exception $e) {
             return null;
         }
-    }
-
-    public function getQueryId($query) {
-        if (!$query) {
-            return null;
-        }
-
-        return $this->findOrCreateQuery($query);
     }
 
     public function getRefererId($referer) {
@@ -598,19 +463,6 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->logRepository->allByRouteName($name);
     }
 
-    public function logEvents() {
-        $this->eventRepository->logEvents();
-    }
-
-    public function logSqlQuery($query, $bindings, $time, $name) {
-        $this->sqlQueryRepository->push([
-                                            'query'    => $query,
-                                            'bindings' => $bindings,
-                                            'time'     => $time,
-                                            'name'     => $name,
-                                        ]);
-    }
-
     public function pageViews($minutes, $uniqueOnly) {
         return $this->logRepository->pageViews($minutes, $uniqueOnly);
     }
@@ -651,20 +503,12 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->geoIpRepository->getRateForGeoipId($geoipId);
     }
 
-    public function parserIsAvailable() {
-        return !empty($this->userAgentParser);
-    }
-
     public function routeIsTrackable($route) {
         return $this->routeRepository->isTrackable($route);
     }
 
     public function setSessionData($data) {
         $this->sessionRepository->setSessionData($data);
-    }
-
-    public function trackEvent($event) {
-        $this->eventRepository->logEvent($event);
     }
 
     public function trackRoute($route, $request) {

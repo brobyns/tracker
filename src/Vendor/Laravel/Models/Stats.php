@@ -76,6 +76,6 @@ class Stats extends Base
         return array(
             'statsPerDay' => $grouped,
             'totals' => [ 'views' => array($totalViewsA, $totalViewsB, $totalViewsC, $totalViewsD),
-                'earnings' => array($totalEarningsA, $totalEarningsB, $totalEarningsC, $totalEarningsD, $totalEarnings)]);
+                          'earnings' => array($totalEarningsA, $totalEarningsB, $totalEarningsC, $totalEarningsD, $totalEarnings)]);
     }
 }
