@@ -1,18 +1,14 @@
 <?php
 
-use PragmaRX\Tracker\Support\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateTrackerTablesRelations extends Migration {
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function migrateUp()
+	public function up()
 	{
 
-		$this->builder->table('tracker_referers', function($table)
+        Schema::table('tracker_referers', function (Blueprint $table)
 		{
 			$table->foreign('domain_id')
 				->references('id')
@@ -21,8 +17,8 @@ class CreateTrackerTablesRelations extends Migration {
 				->onDelete('cascade');
 		});
 
-		$this->builder->table('tracker_sessions', function($table)
-		{
+        Schema::table('tracker_sessions', function (Blueprint $table)
+        {
 			$table->foreign('device_id')
 				->references('id')
 				->on('tracker_devices')
@@ -30,8 +26,8 @@ class CreateTrackerTablesRelations extends Migration {
 				->onDelete('cascade');
 		});
 
-		$this->builder->table('tracker_sessions', function($table)
-		{
+        Schema::table('tracker_sessions', function (Blueprint $table)
+        {
 			$table->foreign('agent_id')
 				->references('id')
 				->on('tracker_agents')
@@ -39,8 +35,8 @@ class CreateTrackerTablesRelations extends Migration {
 				->onDelete('cascade');
 		});
 
-		$this->builder->table('tracker_sessions', function($table)
-		{
+        Schema::table('tracker_sessions', function (Blueprint $table)
+        {
 			$table->foreign('referer_id')
 				->references('id')
 				->on('tracker_referers')
@@ -48,8 +44,8 @@ class CreateTrackerTablesRelations extends Migration {
 				->onDelete('cascade');
 		});
 
-		$this->builder->table('tracker_sessions', function($table)
-		{
+        Schema::table('tracker_sessions', function (Blueprint $table)
+        {
 			$table->foreign('cookie_id')
 				->references('id')
 				->on('tracker_cookies')
@@ -57,8 +53,8 @@ class CreateTrackerTablesRelations extends Migration {
 				->onDelete('cascade');
 		});
 
-		$this->builder->table('tracker_sessions', function($table)
-		{
+        Schema::table('tracker_sessions', function (Blueprint $table)
+        {
 			$table->foreign('geoip_id')
 				->references('id')
 				->on('tracker_geoip')
@@ -66,8 +62,8 @@ class CreateTrackerTablesRelations extends Migration {
 				->onDelete('cascade');
 		});
 
-		$this->builder->table('tracker_log', function($table)
-		{
+        Schema::table('tracker_log', function (Blueprint $table)
+        {
 			$table->foreign('session_id')
 				->references('id')
 				->on('tracker_sessions')
@@ -76,12 +72,7 @@ class CreateTrackerTablesRelations extends Migration {
 		});
 	}
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function migrateDown()
+	public function down()
 	{
 		// Tables will be dropped in the correct order... :)
 	}

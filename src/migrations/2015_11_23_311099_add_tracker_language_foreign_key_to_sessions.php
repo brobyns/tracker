@@ -1,17 +1,14 @@
 <?php
 
-use PragmaRX\Tracker\Support\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class AddTrackerLanguageForeignKeyToSessions extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function migrateUp()
+    public function up()
     {
-        $this->builder->table('tracker_sessions', function ($table) {
+        Schema::table('tracker_sessions', function (Blueprint $table)
+        {
             $table->foreign('language_id')
                   ->references('id')
                   ->on('tracker_languages')
@@ -20,14 +17,10 @@ class AddTrackerLanguageForeignKeyToSessions extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function migrateDown()
+    public function down()
     {
-        $this->builder->table('tracker_sessions', function ($table) {
+        Schema::table('tracker_sessions', function (Blueprint $table)
+        {
             $table->dropForeign(['language_id']);
         });
     }

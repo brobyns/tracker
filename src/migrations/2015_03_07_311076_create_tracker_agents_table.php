@@ -1,48 +1,30 @@
 <?php
 
-use PragmaRX\Tracker\Support\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateTrackerAgentsTable extends Migration {
 
-	/**
-	 * Table related to this migration.
-	 *
-	 * @var string
-	 */
+    private $table = 'tracker_agents';
 
-	private $table = 'tracker_agents';
+    public function up()
+    {
+        Schema::create($this->table, function (Blueprint $table)
+        {
+            $table->bigIncrements('id');
 
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function migrateUp()
-	{
-		$this->builder->create(
-			$this->table,
-			function ($table)
-			{
-				$table->bigIncrements('id');
+            $table->string('name')->unique();
+            $table->string('browser')->index();
+            $table->string('browser_version');
 
-				$table->string('name')->unique();
-				$table->string('browser')->index();
-				$table->string('browser_version');
+            $table->timestamp('created_at')->index();
+            $table->timestamp('updated_at')->index();
+        });
+    }
 
-				$table->timestamp('created_at')->index();
-				$table->timestamp('updated_at')->index();
-			}
-		);
-	}
-
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function migrateDown()
-	{
-		$this->drop($this->table);
-	}
+    public function down()
+    {
+        Schema::drop($this->table);
+    }
 
 }
