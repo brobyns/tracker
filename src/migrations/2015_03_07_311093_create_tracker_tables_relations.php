@@ -97,6 +97,15 @@ class CreateTrackerTablesRelations extends Migration {
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
+        Schema::table('tracker_log', function (Blueprint $table)
+        {
+            $table->foreign('geoip_id')
+                ->references('id')
+                ->on('tracker_geoip')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+        });
 	}
 
 	public function down()

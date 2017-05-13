@@ -118,9 +118,8 @@ class Tracker
     {
         return [
             'session_id' => $this->getSessionId(true),
-            'method'     => $this->request->method(),
-            'image_id'  => $this->request->get('image'),
-            'user_id'    => $this->request->get('user'),
+            'image_id'  => $this->request->get('image_id'),
+            'user_id'    => $this->request->get('user_id'),
             'referer_id' => $this->getRefererId(),
             'geoip_id' => $this->getGeoIpId(),
             'is_adblock' => $this->request->get('isAdblock'),
