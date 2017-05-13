@@ -11,7 +11,6 @@ use PragmaRX\Tracker\Support\MobileDetect;
 use PragmaRX\Tracker\Data\Repositories\Log;
 use PragmaRX\Tracker\Data\Repositories\Path;
 use PragmaRX\Tracker\Data\Repositories\Agent;
-use PragmaRX\Tracker\Services\Authentication;
 use PragmaRX\Tracker\Support\CrawlerDetector;
 use PragmaRX\Tracker\Data\Repositories\Device;
 use PragmaRX\Tracker\Data\Repositories\Cookie;
@@ -20,7 +19,6 @@ use PragmaRX\Tracker\Data\Repositories\Referer;
 use PragmaRX\Tracker\Data\Repositories\Session;
 use Illuminate\Routing\Router as IlluminateRouter;
 use Illuminate\Session\Store as IlluminateSession;
-use PragmaRX\Tracker\Data\Repositories\Connection;
 use PragmaRX\Tracker\Data\Repositories\GeoIpRepository;
 use PragmaRX\Tracker\Data\Repositories\Earnings;
 
@@ -81,7 +79,6 @@ class RepositoryManager implements RepositoryManagerInterface
         Stats $statsRepository,
         Tier $tierRepository
     ) {
-        $this->authentication = $authentication;
 
         $this->mobileDetect = $mobileDetect;
 
@@ -198,10 +195,6 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function getCurrentUserAgent() {
         return $this->userAgentParser->originalUserAgent;
-    }
-
-    public function getCurrentUserId() {
-        return $this->authentication->getCurrentUserId();
     }
 
     /**
@@ -363,14 +356,6 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function updateSessionData($data) {
         return $this->sessionRepository->updateSessionData($data);
-    }
-
-    public function userDevices($minutes, $user_id, $results) {
-        return $this->sessionRepository->userDevices(
-            $minutes,
-            $user_id ?: $this->authentication->getCurrentUserId(),
-            $results
-        );
     }
 
     public function users($minutes, $results) {
