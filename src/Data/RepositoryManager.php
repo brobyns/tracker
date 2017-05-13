@@ -12,18 +12,15 @@ use PragmaRX\Tracker\Data\Repositories\Log;
 use PragmaRX\Tracker\Data\Repositories\Path;
 use PragmaRX\Tracker\Data\Repositories\Agent;
 use PragmaRX\Tracker\Services\Authentication;
-use PragmaRX\Tracker\Data\Repositories\Route;
 use PragmaRX\Tracker\Support\CrawlerDetector;
 use PragmaRX\Tracker\Data\Repositories\Device;
 use PragmaRX\Tracker\Data\Repositories\Cookie;
 use PragmaRX\Tracker\Data\Repositories\Domain;
 use PragmaRX\Tracker\Data\Repositories\Referer;
 use PragmaRX\Tracker\Data\Repositories\Session;
-use PragmaRX\Tracker\Data\Repositories\RoutePath;
 use Illuminate\Routing\Router as IlluminateRouter;
 use Illuminate\Session\Store as IlluminateSession;
 use PragmaRX\Tracker\Data\Repositories\Connection;
-use PragmaRX\Tracker\Data\Repositories\SystemClass;
 use PragmaRX\Tracker\Data\Repositories\GeoIpRepository;
 use PragmaRX\Tracker\Data\Repositories\Earnings;
 
@@ -42,14 +39,6 @@ class RepositoryManager implements RepositoryManagerInterface
      */
     private $refererRepository;
     /**
-     * @var Repositories\Route
-     */
-    private $routeRepository;
-    /**
-     * @var Repositories\RoutePath
-     */
-    private $routePathRepository;
-    /**
      * @var GeoIP
      */
     private $geoIp;
@@ -60,11 +49,6 @@ class RepositoryManager implements RepositoryManagerInterface
      * @var Repositories\Connection
      */
     private $connectionRepository;
-
-    /**
-     * @var Repositories\SystemClass
-     */
-    private $systemClassRepository;
 
     private $userAgentParser;
 
@@ -96,11 +80,8 @@ class RepositoryManager implements RepositoryManagerInterface
         Cookie $cookieRepository,
         Domain $domainRepository,
         Referer $refererRepository,
-        Route $routeRepository,
-        RoutePath $routePathRepository,
         GeoIpRepository $geoIpRepository,
         Connection $connectionRepository,
-        SystemClass $systemClassRepository,
         CrawlerDetector $crawlerDetector,
         Earnings $earningsRepository,
         Balance $balanceRepository,
@@ -135,15 +116,9 @@ class RepositoryManager implements RepositoryManagerInterface
 
         $this->refererRepository = $refererRepository;
 
-        $this->routeRepository = $routeRepository;
-
-        $this->routePathRepository = $routePathRepository;
-
         $this->geoIpRepository = $geoIpRepository;
 
         $this->connectionRepository = $connectionRepository;
-
-        $this->systemClassRepository = $systemClassRepository;
 
         $this->crawlerDetector = $crawlerDetector;
 
@@ -337,98 +312,6 @@ class RepositoryManager implements RepositoryManagerInterface
         return $request->path();
     }
 
-    /**
-     * @param $route
-     * @return mixed
-     */
-    private function getRouteAction($route) {
-        if (is_string($route)) {
-            return '';
-        }
-
-        if (is_array($route)) {
-            return $route['action'];
-        }
-
-        return $route->currentRouteAction();
-    }
-
-    private function getRouteId($name, $action) {
-        return $this->routeRepository->findOrCreate(
-            ['name' => $name, 'action' => $action],
-            ['name', 'action']
-        );
-    }
-
-    /**
-     * @param $route
-     * @return string
-     */
-    private function getRouteName($route) {
-        if (is_string($route)) {
-            return $route;
-        }
-
-        if (is_array($route)) {
-            return $route['name'];
-        }
-
-        return $route->currentRouteName()
-            ?: '';
-    }
-
-    private function getRoutePath($route_id, $path, &$created = null) {
-        return $this->routePathRepository->findOrCreate(
-            ['route_id' => $route_id, 'path' => $path],
-            ['route_id', 'path'],
-            $created
-        );
-    }
-
-    public function getRoutePathId($route, $request) {
-        $route_id = $this->getRouteId(
-            $this->getRouteName($route),
-            $this->getRouteAction($route)
-                ?: 'closure'
-        );
-
-        $created = false;
-
-        $route_path_id = $this->getRoutePath(
-            $route_id,
-            $this->getRequestPath($request),
-            $created
-        );
-
-        if ($created && $route instanceof IlluminateRouter && $route->current()) {
-            foreach ($route->current()->parameters() as $parameter => $value) {
-                // When the parameter value is a whole model, we have
-                // two options left:
-                //
-                //  1) Return model id, if it's available as 'id'
-                //  2) Return null (not ideal, but, what could we do?)
-                //
-                // Should we store the whole model? Not really useful, right?
-
-                if ($value instanceof \Illuminate\Database\Eloquent\Model) {
-                    $model_id = null;
-
-                    foreach ($this->config->get('id_columns_names', ['id']) as $column) {
-                        if (property_exists($value, $column)) {
-                            $model_id = $value->$column;
-
-                            break;
-                        }
-                    }
-
-                    $value = $model_id;
-                }
-            }
-        }
-
-        return $route_path_id;
-    }
-
     public function getSessionId($sessionInfo, $updateLastActivity) {
         return $this->sessionRepository->getCurrentId($sessionInfo, $updateLastActivity);
     }
@@ -439,24 +322,8 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->logRepository->bySession($session->id, $results);
     }
 
-    public function handleException($exception) {
-        $error_id = $this->errorRepository->findOrCreate(
-            [
-                'message' => $this->errorRepository->getMessageFromException($exception),
-                'code'    => $this->errorRepository->getCodeFromException($exception),
-            ],
-            ['message', 'code']
-        );
-
-        return $this->logRepository->updateError($error_id);
-    }
-
     public function isRobot() {
         return $this->crawlerDetector->isRobot();
-    }
-
-    public function logByRouteName($name, $minutes = null) {
-        return $this->logRepository->allByRouteName($name);
     }
 
     public function pageViews($minutes, $uniqueOnly) {
@@ -499,22 +366,8 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->geoIpRepository->getRateForGeoipId($geoipId);
     }
 
-    public function routeIsTrackable($route) {
-        return $this->routeRepository->isTrackable($route);
-    }
-
     public function setSessionData($data) {
         $this->sessionRepository->setSessionData($data);
-    }
-
-    public function trackRoute($route, $request) {
-        $this->updateRoute(
-            $this->getRoutePathId($route, $request)
-        );
-    }
-
-    public function updateRoute($route_id) {
-        return $this->logRepository->updateRoute($route_id);
     }
 
     public function updateSessionData($data) {

@@ -83,24 +83,6 @@ class CreateTrackerTablesRelations extends Migration {
 				->onUpdate('cascade')
 				->onDelete('cascade');
 		});
-
-		$this->builder->table('tracker_log', function($table)
-		{
-			$table->foreign('path_id')
-				->references('id')
-				->on('tracker_paths')
-				->onUpdate('cascade')
-				->onDelete('cascade');
-		});
-
-		$this->builder->table('tracker_log', function($table)
-		{
-			$table->foreign('route_path_id')
-				->references('id')
-				->on('tracker_route_paths')
-				->onUpdate('cascade')
-				->onDelete('cascade');
-		});
 	}
 
 	/**

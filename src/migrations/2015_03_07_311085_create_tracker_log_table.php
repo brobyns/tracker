@@ -29,6 +29,7 @@ class CreateTrackerLogTable extends Migration {
 				$table->bigInteger('path_id')->unsigned()->nullable()->index();
 				$table->boolean('is_real');
 				$table->boolean('is_adblock');
+				$table->boolean('is_proxy');
 
 				$table->timestamp('created_at')->index();
 				$table->timestamp('updated_at')->index();

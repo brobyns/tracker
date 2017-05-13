@@ -224,15 +224,9 @@ return [
 
     'referer_search_term_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\RefererSearchTerm',
 
-    'route_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Route',
-
-    'route_path_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\RoutePath',
-
     'geoip_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\GeoIp',
 
     'connection_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Connection',
-
-    'system_class_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\SystemClass',
 
 	'earnings_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Earnings',
 

@@ -6,34 +6,6 @@ class Log extends Repository
 {
 	private $currentLogId = null;
 
-	public function updateRoute($route_path_id)
-	{
-		$model = $this->getModel();
-
-		if ($model->id)
-		{
-			$model->route_path_id = $route_path_id;
-
-			$model->save();
-		}
-
-		return $model;
-	}
-
-	public function updateError($error_id)
-	{
-		$model = $this->getModel();
-
-		if ($model->id)
-		{
-			$model->error_id = $error_id;
-
-			$model->save();
-		}
-
-		return $model;
-	}
-
 	public function bySession($sessionId, $results = true)
 	{
 		$query = $this
@@ -107,16 +79,6 @@ class Log extends Repository
 
 	public function isIpUnique($userid, $clientIp) {
 		return $this->getModel()->isIpUnique($userid, $clientIp);
-	}
-
-	public function getErrors($minutes, $results)
-	{
-		return $this->getModel()->errors($minutes, $results);
-	}
-
-	public function allByRouteName($name)
-	{
-		return $this->getModel()->allByRouteName($name);
 	}
 
 	public function delete()

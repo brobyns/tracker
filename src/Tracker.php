@@ -122,7 +122,6 @@ class Tracker
             'session_id' => $this->getSessionId(true),
             'method'     => $this->request->method(),
             'path_id'    => $this->getPathId(),
-            'route_path_id' => $this->getRoutePathId(),
             'referer_id' => $this->getRefererId(),
             'geoip_id' => $this->getGeoIpId(),
             'is_adblock' => $this->request->get('isAdblock'),
@@ -148,11 +147,6 @@ class Tracker
                 $this->request->headers->get('referer')
             )
             : null;
-    }
-
-    protected function getRoutePathId()
-    {
-        return $this->dataRepositoryManager->getRoutePathId($this->route, $this->request);
     }
 
     /**
@@ -192,16 +186,6 @@ class Tracker
         return $this->config->get('log_users')
             ? $this->dataRepositoryManager->getCurrentUserId()
             : null;
-    }
-
-    /**
-     * @param \Exception $exception
-     */
-    public function handleException($exception)
-    {
-        if ($this->config->get('log_enabled')) {
-            $this->dataRepositoryManager->handleException($exception);
-        }
     }
 
     public function isEnabled()
@@ -270,27 +254,6 @@ class Tracker
 
     public function getRateForGeoipId($geoipId) {
         return $this->dataRepositoryManager->getRateForGeoipId($geoipId);
-    }
-
-    public function routerMatched($log)
-    {
-        if ($this->dataRepositoryManager->routeIsTrackable($this->route)) {
-            if ($log) {
-                $this->dataRepositoryManager->updateRoute(
-                    $this->getRoutePathId()
-                );
-            }
-        }
-        // Router was matched but this route is not trackable
-        // Let's just delete the stored data, because There's not a
-        // realy clean way of doing this because if a route is not
-        // matched, and this happens ages after the app is booted,
-        // we till need to store data from the request.
-        else {
-            $this->turnOff();
-
-            $this->deleteCurrentLog();
-        }
     }
 
     public function sessionLog($uuid, $results = true)

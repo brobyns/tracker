@@ -13,7 +13,6 @@ use PragmaRX\Tracker\Support\MobileDetect;
 use PragmaRX\Tracker\Data\Repositories\Log;
 use PragmaRX\Tracker\Data\RepositoryManager;
 use PragmaRX\Tracker\Data\Repositories\Path;
-use PragmaRX\Tracker\Data\Repositories\Route;
 use PragmaRX\Tracker\Services\Authentication;
 use PragmaRX\Tracker\Support\CrawlerDetector;
 use PragmaRX\Tracker\Support\UserAgentParser;
@@ -23,9 +22,7 @@ use PragmaRX\Tracker\Data\Repositories\Cookie;
 use PragmaRX\Tracker\Data\Repositories\Domain;
 use PragmaRX\Tracker\Data\Repositories\Referer;
 use PragmaRX\Tracker\Data\Repositories\Session;
-use PragmaRX\Tracker\Data\Repositories\RoutePath;
 use PragmaRX\Tracker\Data\Repositories\Connection;
-use PragmaRX\Tracker\Data\Repositories\SystemClass;
 use PragmaRX\Tracker\Data\Repositories\GeoIpRepository;
 use PragmaRX\Support\ServiceProvider as PragmaRXServiceProvider;
 use PragmaRX\Tracker\Vendor\Laravel\Artisan\Tables as TablesCommand;
@@ -147,17 +144,11 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
 	        $refererSearchTermModel = $this->instantiateModel('referer_search_term_model');
 
-	        $routeModel = $this->instantiateModel('route_model');
-
-	        $routePathModel = $this->instantiateModel('route_path_model');
-
 	        $geoipModel = $this->instantiateModel('geoip_model');
 
 	        $connectionModel = $this->instantiateModel('connection_model');
 
-	        $systemClassModel = $this->instantiateModel('system_class_model');
-
-			$earningModel = $this->instantiateModel('earnings_model');
+	        $earningModel = $this->instantiateModel('earnings_model');
 
 			$balanceModel = $this->instantiateModel('balance_model');
 
@@ -168,13 +159,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
 	        $logRepository = new Log($logModel);
 
 	        $connectionRepository = new Connection($connectionModel);
-
-			$systemClassRepository = new SystemClass($systemClassModel);
-
-	        $routeRepository = new Route(
-		        $routeModel,
-		        $app['tracker.config']
-	        );
 
 	        $crawlerDetect = new CrawlerDetector(
 		        $app['request']->headers->all(),
@@ -220,15 +204,9 @@ class ServiceProvider extends PragmaRXServiceProvider {
                     $app->make('PragmaRX\Tracker\Support\RefererParser')
                 ),
 
-                $routeRepository,
-
-                new RoutePath($routePathModel),
-
                 new GeoIpRepository($geoipModel),
 
 	            $connectionRepository,
-
-	            $systemClassRepository,
 
 		        $crawlerDetect,
 
