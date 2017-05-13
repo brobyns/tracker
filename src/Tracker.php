@@ -119,6 +119,7 @@ class Tracker
         return [
             'session_id' => $this->getSessionId(true),
             'method'     => $this->request->method(),
+            'image_id'  => $this->request->get('image'),
             'user_id'    => $this->request->get('user'),
             'referer_id' => $this->getRefererId(),
             'geoip_id' => $this->getGeoIpId(),
@@ -166,13 +167,6 @@ class Tracker
             $this->makeSessionData(),
             $updateLastActivity
         );
-    }
-
-    public function getUserId()
-    {
-        return $this->config->get('log_users')
-            ? $this->dataRepositoryManager->getCurrentUserId()
-            : null;
     }
 
     public function isRobot()
@@ -249,15 +243,14 @@ class Tracker
         $log = $this->getLogData();
         $this->dataRepositoryManager->createLog($log);
 
-        $path = $this->dataRepositoryManager->getPath($log['path_id']);
         $tier = $this->dataRepositoryManager->getTier($log['geoip_id']);
         $clientIp = $this->request->getClientIp();
 
-        if ($this->isIpUnique($path->user_id, $clientIp))
+        if ($this->isIpUnique($log['user_id'], $clientIp))
         {
-            $this->dataRepositoryManager->updateStatsForImage($path->image_id, $tier->id, $tier->rate);
-            $this->dataRepositoryManager->updateEarningsForUser($path->user_id, $tier->id, $tier->rate);
-            $this->dataRepositoryManager->updateBalanceForUser($path->user_id, $tier->rate);
+            $this->dataRepositoryManager->updateStatsForImage($log['image_id'], $tier->id, $tier->rate);
+            $this->dataRepositoryManager->updateEarningsForUser($log['user_id'], $tier->id, $tier->rate);
+            $this->dataRepositoryManager->updateBalanceForUser($log['user_id'], $tier->rate);
         }
     }
 
