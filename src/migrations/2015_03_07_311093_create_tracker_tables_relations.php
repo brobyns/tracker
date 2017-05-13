@@ -88,15 +88,6 @@ class CreateTrackerTablesRelations extends Migration {
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
-
-        Schema::table('tracker_log', function (Blueprint $table)
-        {
-            $table->foreign('referer_id')
-                ->references('id')
-                ->on('tracker_referers')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-        });
 	}
 
 	public function down()
