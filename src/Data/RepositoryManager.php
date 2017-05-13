@@ -45,11 +45,6 @@ class RepositoryManager implements RepositoryManagerInterface
 
     private $geoIpRepository;
 
-    /**
-     * @var Repositories\Connection
-     */
-    private $connectionRepository;
-
     private $userAgentParser;
 
     /**
@@ -69,7 +64,6 @@ class RepositoryManager implements RepositoryManagerInterface
         GeoIp $geoIp,
         MobileDetect $mobileDetect,
         $userAgentParser,
-        Authentication $authentication,
         IlluminateSession $session,
         Config $config,
         Session $sessionRepository,
@@ -81,7 +75,6 @@ class RepositoryManager implements RepositoryManagerInterface
         Domain $domainRepository,
         Referer $refererRepository,
         GeoIpRepository $geoIpRepository,
-        Connection $connectionRepository,
         CrawlerDetector $crawlerDetector,
         Earnings $earningsRepository,
         Balance $balanceRepository,
@@ -117,8 +110,6 @@ class RepositoryManager implements RepositoryManagerInterface
         $this->refererRepository = $refererRepository;
 
         $this->geoIpRepository = $geoIpRepository;
-
-        $this->connectionRepository = $connectionRepository;
 
         $this->crawlerDetector = $crawlerDetector;
 

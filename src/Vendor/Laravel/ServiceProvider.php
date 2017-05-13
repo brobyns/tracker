@@ -13,7 +13,6 @@ use PragmaRX\Tracker\Support\MobileDetect;
 use PragmaRX\Tracker\Data\Repositories\Log;
 use PragmaRX\Tracker\Data\RepositoryManager;
 use PragmaRX\Tracker\Data\Repositories\Path;
-use PragmaRX\Tracker\Services\Authentication;
 use PragmaRX\Tracker\Support\CrawlerDetector;
 use PragmaRX\Tracker\Support\UserAgentParser;
 use PragmaRX\Tracker\Data\Repositories\Agent;
@@ -22,7 +21,6 @@ use PragmaRX\Tracker\Data\Repositories\Cookie;
 use PragmaRX\Tracker\Data\Repositories\Domain;
 use PragmaRX\Tracker\Data\Repositories\Referer;
 use PragmaRX\Tracker\Data\Repositories\Session;
-use PragmaRX\Tracker\Data\Repositories\Connection;
 use PragmaRX\Tracker\Data\Repositories\GeoIpRepository;
 use PragmaRX\Support\ServiceProvider as PragmaRXServiceProvider;
 use PragmaRX\Tracker\Vendor\Laravel\Artisan\Tables as TablesCommand;
@@ -41,8 +39,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
      * @var bool
      */
     protected $defer = false;
-
-	private $userChecked = false;
 
 	private $tracker;
 
@@ -65,17 +61,11 @@ class ServiceProvider extends PragmaRXServiceProvider {
     {
 	    parent::register();
 
-	    $this->registerAuthentication();
-
         $this->registerRepositories();
 
         $this->registerTracker();
 
         $this->registerTablesCommand();
-
-        $this->registerExecutionCallback();
-
-        $this->registerUserCheckCallback();
 
         $this->commands('tracker.tables.command');
     }
@@ -146,8 +136,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
 	        $geoipModel = $this->instantiateModel('geoip_model');
 
-	        $connectionModel = $this->instantiateModel('connection_model');
-
 	        $earningModel = $this->instantiateModel('earnings_model');
 
 			$balanceModel = $this->instantiateModel('balance_model');
@@ -157,8 +145,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
 			$tierModel = $this->instantiateModel('tier_model');
 
 	        $logRepository = new Log($logModel);
-
-	        $connectionRepository = new Connection($connectionModel);
 
 	        $crawlerDetect = new CrawlerDetector(
 		        $app['request']->headers->all(),
@@ -171,8 +157,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
 	            new MobileDetect,
 
 	            $uaParser,
-
-	            $app['tracker.authentication'],
 
 	            $app['session.store'],
 
@@ -206,8 +190,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
                 new GeoIpRepository($geoipModel),
 
-	            $connectionRepository,
-
 		        $crawlerDetect,
 
 				new Earnings($earningModel),
@@ -221,29 +203,11 @@ class ServiceProvider extends PragmaRXServiceProvider {
         });
     }
 
-    public function registerAuthentication()
-    {
-        $this->app->singleton('tracker.authentication', function ($app)
-        {
-            return new Authentication($app['tracker.config'], $app);
-        });
-    }
-
 	private function registerTablesCommand()
 	{
         $this->app->singleton('tracker.tables.command', function ($app)
 		{
 			return new TablesCommand();
-		});
-	}
-
-	private function registerExecutionCallback()
-	{
-		$me = $this;
-
-		$this->app['events']->listen('Illuminate\Routing\Events\RouteMatched', function($event) use ($me)
-		{
-			$me->getTracker()->routerMatched($me->getConfig('log_routes'));
 		});
 	}
 
@@ -280,23 +244,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
 	public function getPackageDir()
 	{
 		return __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..';
-	}
-
-	private function registerUserCheckCallback()
-	{
-		$me = $this;
-
-		$this->app['events']->listen('router.before', function($object = null) use ($me)
-		{
-			if ($me->tracker &&
-				! $me->userChecked &&
-				$me->getConfig('log_users') &&
-				$me->app->resolved($me->getConfig('authentication_ioc_binding'))
-			)
-			{
-				$me->userChecked = $me->getTracker()->checkCurrentUser();
-			}
-		});
 	}
 
 	public function getTracker()

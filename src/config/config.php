@@ -8,106 +8,6 @@ return [
 	'enabled' => false,
 
 	/**
-	 * Robots should be tracked?
-	 */
-	'do_not_track_robots' => false,
-
-	/**
-	 * Which environments are not trackable?
-	 */
-	'do_not_track_environments' => [
-		// defaults to none
-	],
-
-	/**
-	 * Which routes names are not trackable?
-	 */
-	'do_not_track_routes' => [
-		'tracker.stats.*',
-	],
-
-	/**
-	 * The Do Not Track Ips is used to disable Tracker for some IP addresses:
-	 *
-	 *     '127.0.0.1', '192.168.1.1'
-	 *
-	 * You can set ranges of IPs
-	 *     '192.168.0.1-192.168.0.100'
-	 *
-	 * And use net masks
-	 *     '10.0.0.0/32'
-	 *     '172.17.0.0/255.255.0.0'
-	 */
-	'do_not_track_ips' => [
-		//'127.0.0.0/24' /// range 127.0.0.1 - 127.0.0.255
-	],
-
-	/**
-	 * Log every single access?
-	 *
-	 * The log table can become huge if your site is popular, but...
-	 *
-	 * Log table is also responsible for storing information on:
-	 *
-	 *    - Routes and controller actions accessed
-	 *    - HTTP method used (GET, POST...)
-	 *    - Error log
-	 *    - URL queries (including values)
-	 */
-	'log_enabled' => false,
-
-	/**
-	 * Log SQL queries?
-	 *
-	 * Log must be enabled for this option to work.
-	 */
-	'log_sql_queries' => false,
-
-	/**
-	 * If you prefer to store Tracker data on a different database or connection,
-	 * you can set it here.
-	 *
-	 * To avoid SQL queries log recursion, create a different connection for Tracker,
-	 * point it to the same database (or not) and forbid logging of this connection in
-	 * do_not_log_sql_queries_connections.
-	 */
-	'connection' => 'tracker',
-
-	/**
-	 * Forbid logging of SQL queries for some connections.
-	 *
-	 * To avoid recursion, you better ignore Tracker connection here.
-	 *
-	 * Please create a separate database connection for Tracker. It can hit
-	 * the same database of your application, but the connection itself
-	 * has to have a different name, so the package can ignore its own queries
-	 * and avoid recursion.
-	 *
-	 */
-	'do_not_log_sql_queries_connections' => [
-		'tracker'
-	],
-
-	/**
-	 * Also log SQL query bindings?
-	 *
-	 * Log must be enabled for this option to work.
-	 */
-	'log_sql_queries_bindings' => false,
-
-	/**
-	 * Log events?
-	 */
-	'log_events' => false,
-
-	/**
-	 * Which events do you want to log exactly?
-	 */
-	'log_only_events' => [
-		// defaults to logging all events
-	],
-
-	/**
 	 * What are the names of the id columns on your system?
 	 *
 	 * 'id' is the most common, but if you have one or more different,
@@ -115,20 +15,6 @@ return [
 	 */
 	'id_columns_names' => [
 		'id'
-	],
-	/**
-	 * Do not log events for the following patterns.
-	 * Strings accepts wildcards:
-	 *
-	 *    eloquent.*
-	 *
-	 */
-	'do_not_log_events' => [
-		'illuminate.log',
-		'eloquent.*',
-		'router.*',
-		'composing: *',
-		'creating: *',
 	],
 
 	/**
@@ -169,16 +55,6 @@ return [
 	 * Do you wish to log url paths?
 	 */
 	'log_paths' => false,
-
-	/**
-	 * Do you wish to log routes and route parameters?
-	 */
-	'log_routes' => false,
-
-	/**
-	 * Log errors and exceptions?
-	 */
-	'log_exceptions' => false,
 
 	/**
 	 * A cookie may be created on your visitor device, so you can have information
@@ -226,8 +102,6 @@ return [
 
     'geoip_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\GeoIp',
 
-    'connection_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Connection',
-
 	'earnings_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Earnings',
 
 	'balance_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Balance',
@@ -235,22 +109,4 @@ return [
 	'stats_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Stats',
 
 	'tier_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Tier',
-
-	/**
-	 * Laravel internal variables on user authentication and login.
-	 */
-	'authentication_ioc_binding' => 'auth', // defaults to 'auth' in Illuminate\Support\Facades\Auth
-
-    'authenticated_check_method' => 'check', // to Auth::check()
-
-    'authenticated_user_method' => 'user', // to Auth::user()
-
-    'authenticated_user_id_column' => 'id', // to Auth::user()->id
-
-    'authenticated_user_username_column' => 'email', // to Auth::user()->email
-
-	/**
-     * Stats Panel controllers namespace
-     */
-    'stats_controllers_namespace' => 'PragmaRX\Tracker\Vendor\Laravel\Controllers',
 ];
