@@ -14,7 +14,7 @@ class CreateTrackerLogTable extends Migration {
             $table->bigIncrements('id');
 
             $table->bigInteger('session_id')->unsigned()->index();
-            $table->bigInteger('path_id')->unsigned()->nullable()->index();
+            $table->bigInteger('user_id')->unsigned()->index();
             $table->boolean('is_real');
             $table->boolean('is_adblock');
             $table->boolean('is_proxy');
