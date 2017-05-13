@@ -12,7 +12,6 @@ use PragmaRX\Support\GeoIp\GeoIp;
 use PragmaRX\Tracker\Support\MobileDetect;
 use PragmaRX\Tracker\Data\Repositories\Log;
 use PragmaRX\Tracker\Data\RepositoryManager;
-use PragmaRX\Tracker\Data\Repositories\Path;
 use PragmaRX\Tracker\Support\CrawlerDetector;
 use PragmaRX\Tracker\Support\UserAgentParser;
 use PragmaRX\Tracker\Data\Repositories\Agent;
@@ -126,8 +125,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
             $cookieModel = $this->instantiateModel('cookie_model');
 
-	        $pathModel = $this->instantiateModel('path_model');
-
 	        $domainModel = $this->instantiateModel('domain_model');
 
 	        $refererModel = $this->instantiateModel('referer_model');
@@ -167,8 +164,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
                             new PhpSession()),
 
                 $logRepository,
-
-                new Path($pathModel),
 
                 new Agent($agentModel),
 

@@ -121,23 +121,12 @@ class Tracker
         return [
             'session_id' => $this->getSessionId(true),
             'method'     => $this->request->method(),
-            'path_id'    => $this->getPathId(),
+            'user_id'    => $this->request->get('user'),
             'referer_id' => $this->getRefererId(),
             'geoip_id' => $this->getGeoIpId(),
             'is_adblock' => $this->request->get('isAdblock'),
             'is_real' => $this->request->get('isReal')
         ];
-    }
-
-    public function getPathId()
-    {
-        return $this->config->get('log_paths')
-            ? $this->dataRepositoryManager->findOrCreatePath(
-                [
-                    'path' => $this->request->path(),
-                ]
-            )
-            : null;
     }
 
     protected function getRefererId()
@@ -196,15 +185,6 @@ class Tracker
     public function isRobot()
     {
         return $this->dataRepositoryManager->isRobot();
-    }
-
-    public function logByRouteName($name, $minutes = null)
-    {
-        if ($minutes) {
-            $minutes = Minutes::make($minutes);
-        }
-
-        return $this->dataRepositoryManager->logByRouteName($name, $minutes);
     }
 
     protected function notRobotOrTrackable()
@@ -312,14 +292,5 @@ class Tracker
     public function users($minutes, $results = true)
     {
         return $this->dataRepositoryManager->users(Minutes::make($minutes), $results);
-    }
-
-    public function createPath($path, $userid, $imageId) {
-        $this->dataRepositoryManager->createPath(
-            [
-                'path' => $path,
-                'user_id' => $userid,
-                'image_id' => $imageId
-            ]);
     }
 }

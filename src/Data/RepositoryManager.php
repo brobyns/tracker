@@ -9,7 +9,6 @@ use PragmaRX\Tracker\Data\Repositories\Stats;
 use PragmaRX\Tracker\Data\Repositories\Tier;
 use PragmaRX\Tracker\Support\MobileDetect;
 use PragmaRX\Tracker\Data\Repositories\Log;
-use PragmaRX\Tracker\Data\Repositories\Path;
 use PragmaRX\Tracker\Data\Repositories\Agent;
 use PragmaRX\Tracker\Support\CrawlerDetector;
 use PragmaRX\Tracker\Data\Repositories\Device;
@@ -24,10 +23,6 @@ use PragmaRX\Tracker\Data\Repositories\Earnings;
 
 class RepositoryManager implements RepositoryManagerInterface
 {
-    /**
-     * @var Path
-     */
-    private $pathRepository;
     /**
      * @var Domain
      */
@@ -66,7 +61,6 @@ class RepositoryManager implements RepositoryManagerInterface
         Config $config,
         Session $sessionRepository,
         Log $logRepository,
-        Path $pathRepository,
         Agent $agentRepository,
         Device $deviceRepository,
         Cookie $cookieRepository,
@@ -93,8 +87,6 @@ class RepositoryManager implements RepositoryManagerInterface
         $this->sessionRepository = $sessionRepository;
 
         $this->logRepository = $logRepository;
-
-        $this->pathRepository = $pathRepository;
 
         $this->agentRepository = $agentRepository;
 
@@ -138,18 +130,6 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function findOrCreateDevice($data) {
         return $this->deviceRepository->findOrCreate($data, ['kind', 'model', 'platform', 'platform_version']);
-    }
-
-    public function findOrCreatePath($path) {
-        return $this->pathRepository->findOrCreate($path, ['path']);
-    }
-
-    public function createPath($data) {
-        return $this->pathRepository->findOrCreate($data, ['path', 'user_id', 'image_id']);
-    }
-
-    public function getPath($pathid) {
-        return $this->pathRepository->getPath($pathid);
     }
 
     public function getTier($geoipId) {
@@ -278,22 +258,6 @@ class RepositoryManager implements RepositoryManagerInterface
 
             return $this->refererRepository->store($referer, $url['host'], $domain_id);
         }
-    }
-
-    /**
-     * @param $request
-     * @return mixed
-     */
-    private function getRequestPath($request) {
-        if (is_string($request)) {
-            return $request;
-        }
-
-        if (is_array($request)) {
-            return $request['path'];
-        }
-
-        return $request->path();
     }
 
     public function getSessionId($sessionInfo, $updateLastActivity) {

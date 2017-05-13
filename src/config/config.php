@@ -52,11 +52,6 @@ return [
 	'log_referers' => false,
 
 	/**
-	 * Do you wish to log url paths?
-	 */
-	'log_paths' => false,
-
-	/**
 	 * A cookie may be created on your visitor device, so you can have information
 	 * on everything made using that device on your site.	 *
 	 */
@@ -85,8 +80,6 @@ return [
     'session_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Session',
 
     'log_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Log',
-
-    'path_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Path',
 
     'agent_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Agent',
 
