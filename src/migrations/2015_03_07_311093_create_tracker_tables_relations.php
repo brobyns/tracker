@@ -12,15 +12,6 @@ class CreateTrackerTablesRelations extends Migration {
 	public function migrateUp()
 	{
 
-		$this->builder->table('tracker_route_paths', function($table)
-		{
-			$table->foreign('route_id')
-				->references('id')
-				->on('tracker_routes')
-				->onUpdate('cascade')
-				->onDelete('cascade');
-		});
-
 		$this->builder->table('tracker_referers', function($table)
 		{
 			$table->foreign('domain_id')
