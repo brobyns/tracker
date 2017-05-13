@@ -80,8 +80,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
         $this->registerUserCheckCallback();
 
-        $this->registerDatatables();
-
         $this->commands('tracker.tables.command');
     }
 
@@ -294,13 +292,6 @@ class ServiceProvider extends PragmaRXServiceProvider {
         }
 
 		return $model;
-	}
-
-	private function registerDatatables()
-	{
-		$this->registerServiceProvider('Bllim\Datatables\DatatablesServiceProvider');
-
-		$this->registerServiceAlias('Datatable', 'Bllim\Datatables\Facade\Datatables');
 	}
 
 	/**
