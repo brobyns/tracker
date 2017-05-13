@@ -143,7 +143,7 @@ class Tracker
     protected function makeSessionData()
     {
         $sessionData = [
-            'user_id'    => $this->getUserId(),
+            'user_id'    => $this->request->user() ? $this->request->user() : null,
             'device_id'  => $this->getDeviceId(),
             'client_ip'  => $this->request->getClientIp(),
             'geoip_id'   => $this->getGeoIpId(),
