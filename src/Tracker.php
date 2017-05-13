@@ -25,8 +25,6 @@ class Tracker
      */
     protected $laravel;
 
-    protected $enabled = true;
-
     protected $sessionData;
 
     public function __construct(
@@ -177,11 +175,6 @@ class Tracker
             : null;
     }
 
-    public function isEnabled()
-    {
-        return $this->enabled;
-    }
-
     public function isRobot()
     {
         return $this->dataRepositoryManager->isRobot();
@@ -266,11 +259,6 @@ class Tracker
             $this->dataRepositoryManager->updateEarningsForUser($path->user_id, $tier->id, $tier->rate);
             $this->dataRepositoryManager->updateBalanceForUser($path->user_id, $tier->rate);
         }
-    }
-
-    protected function turnOff()
-    {
-        $this->enabled = false;
     }
 
     public function userDevices($minutes, $user_id = null, $results = true)
