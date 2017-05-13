@@ -3,11 +3,6 @@
 return [
 
 	/**
-	 * Enable it?
-	 */
-	'enabled' => false,
-
-	/**
 	 * What are the names of the id columns on your system?
 	 *
 	 * 'id' is the most common, but if you have one or more different,

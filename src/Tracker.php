@@ -254,25 +254,18 @@ class Tracker
     public function track()
     {
         $log = $this->getLogData();
+        $this->dataRepositoryManager->createLog($log);
 
-        if ($this->config->get('log_enabled')) {
-            $this->dataRepositoryManager->createLog($log);
+        $path = $this->dataRepositoryManager->getPath($log['path_id']);
+        $tier = $this->dataRepositoryManager->getTier($log['geoip_id']);
+        $clientIp = $this->request->getClientIp();
 
-            $path = $this->dataRepositoryManager->getPath($log['path_id']);
-            $tier = $this->dataRepositoryManager->getTier($log['geoip_id']);
-            //$clientIp = $this->request->getClientIp();
-            $clientIp = '37.59.40.14';
-            if ($this->isIpUnique($path->user_id, $clientIp)) {
-                $this->dataRepositoryManager->updateStatsForImage($path->image_id, $tier->id, $tier->rate);
-                $this->dataRepositoryManager->updateEarningsForUser($path->user_id, $tier->id, $tier->rate);
-                $this->dataRepositoryManager->updateBalanceForUser($path->user_id, $tier->rate);
-            }
+        if ($this->isIpUnique($path->user_id, $clientIp))
+        {
+            $this->dataRepositoryManager->updateStatsForImage($path->image_id, $tier->id, $tier->rate);
+            $this->dataRepositoryManager->updateEarningsForUser($path->user_id, $tier->id, $tier->rate);
+            $this->dataRepositoryManager->updateBalanceForUser($path->user_id, $tier->rate);
         }
-    }
-
-    public function trackVisit($route, $request)
-    {
-        $this->dataRepositoryManager->trackRoute($route, $request);
     }
 
     protected function turnOff()
