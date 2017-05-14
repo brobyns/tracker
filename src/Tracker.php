@@ -9,6 +9,7 @@ use Illuminate\Routing\Router;
 use PragmaRX\Support\Config;
 use PragmaRX\Tracker\Data\RepositoryManager as DataRepositoryManager;
 use PragmaRX\Tracker\Support\Minutes;
+use GuzzleHttp;
 
 class Tracker
 {
@@ -111,6 +112,20 @@ class Tracker
             : null;
     }
 
+    protected function isProxy()
+    {
+        $client = new GuzzleHttp\Client();
+        $response = $client->request('GET', 'http://www.shroomery.org/ythan/proxycheck.php', [
+        'query' => ['ip' => $this->request->getClientIp()]
+        ]);
+
+        if($response->getStatusCode() === 200) {
+            $stringBody = (string) $response->getBody();
+            return $stringBody === 'Y';
+        }
+        return false;
+    }
+
     /**
      * @return array
      */
@@ -123,7 +138,8 @@ class Tracker
             'referer_id' => $this->getRefererId(),
             'geoip_id' => $this->getGeoIpId(),
             'is_adblock' => $this->request->get('isAdblock'),
-            'is_real' => $this->request->get('isReal')
+            'is_real' => $this->request->get('isReal'),
+            'is_proxy' => $this->isProxy()
         ];
     }
 
