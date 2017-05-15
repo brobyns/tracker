@@ -17,7 +17,7 @@ class Balance extends Repository {
         if ($balance) {
             $balance->amount += $amount;
         } else {
-            $balance = new \App\Balance();
+            $balance = $this->newModel();
             $balance->amount = $amount;
             $balance->user_id = $userid;
         }

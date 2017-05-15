@@ -107,9 +107,7 @@ class Tracker
 
     protected function getGeoIpId()
     {
-        return $this->config->get('log_geoip')
-            ? $this->dataRepositoryManager->getGeoIpId($this->request->getClientIp())
-            : null;
+        return $this->dataRepositoryManager->getGeoIpId($this->request->getClientIp());
     }
 
     protected function isProxy()
@@ -137,19 +135,16 @@ class Tracker
             'user_id'    => $this->request->get('user_id'),
             'referer_id' => $this->getRefererId(),
             'geoip_id' => $this->getGeoIpId(),
-            'is_adblock' => $this->request->get('isAdblock'),
-            'is_real' => $this->request->get('isReal'),
+            'is_adblock' => $this->request->get('is_adblock'),
+            'is_real' => $this->request->get('is_real'),
             'is_proxy' => $this->isProxy()
         ];
     }
 
     protected function getRefererId()
     {
-        return $this->config->get('log_referers')
-            ? $this->dataRepositoryManager->getRefererId(
-                $this->request->headers->get('referer')
-            )
-            : null;
+        return $this->dataRepositoryManager->getRefererId(
+                $this->request->headers->get('referer'));
     }
 
     /**

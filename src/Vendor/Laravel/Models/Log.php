@@ -16,7 +16,8 @@ class Log extends Base {
         'referer_id',
 		'geoip_id',
         'is_real',
-        'is_adblock'
+        'is_adblock',
+        'is_proxy'
 	);
 
 	public function session()
@@ -123,7 +124,7 @@ class Log extends Base {
 	public function isIpUnique($userid, $clientIp) {
 		$query = $this
 			->join('tracker_sessions', 'tracker_sessions.id', '=', 'tracker_log.session_id')
-			->where('user_id', $userid)
+			->where('tracker_log.user_id', $userid)
             ->where('tracker_sessions.client_ip', $clientIp)
 			->today('tracker_sessions');
 		return $query->count() < 2;
