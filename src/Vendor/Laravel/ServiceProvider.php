@@ -197,7 +197,7 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
 				new Tier($tierModel),
 
-                new ImageService(new ImageController())
+                new ImageService(new ImagesController())
             );
         });
     }
