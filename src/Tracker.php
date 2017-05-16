@@ -49,6 +49,11 @@ class Tracker
         $this->laravel = $laravel;
     }
 
+    public function boot()
+    {
+        $this->track();
+    }
+
     public function allSessions()
     {
         return $this->dataRepositoryManager->getAllSessions();
@@ -129,14 +134,15 @@ class Tracker
      */
     protected function getLogData()
     {
+        $image = $this->getImageIdAndUserId();
         return [
             'session_id' => $this->getSessionId(true),
-            'image_id'  => $this->request->get('image_id'),
-            'user_id'    => $this->request->get('user_id'),
+            'image_id'  => $image->id,
+            'user_id'    => $image->user_id,
             'referer_id' => $this->getRefererId(),
             'geoip_id' => $this->getGeoIpId(),
-            'is_adblock' => $this->request->get('is_adblock'),
-            'is_real' => $this->request->get('is_real'),
+            'is_adblock' => true,
+            'is_real' => false,
             'is_proxy' => $this->isProxy()
         ];
     }
@@ -177,6 +183,11 @@ class Tracker
             $this->makeSessionData(),
             $updateLastActivity
         );
+    }
+
+    public function getImageIdAndUserId() {
+        $fileName = $this->request->path();
+        return $this->dataRepositoryManager->getImageIdAndUserId($fileName);
     }
 
     public function isRobot()

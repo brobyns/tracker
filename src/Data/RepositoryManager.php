@@ -2,6 +2,7 @@
 
 namespace PragmaRX\Tracker\Data;
 
+use App\Http\Services\ImageService;
 use PragmaRX\Support\Config;
 use PragmaRX\Support\GeoIp\GeoIp;
 use PragmaRX\Tracker\Data\Repositories\Balance;
@@ -53,6 +54,8 @@ class RepositoryManager implements RepositoryManagerInterface
 
     private $tierRepository;
 
+    private $imageService;
+
     public function __construct(
         GeoIp $geoIp,
         MobileDetect $mobileDetect,
@@ -71,7 +74,8 @@ class RepositoryManager implements RepositoryManagerInterface
         Earnings $earningsRepository,
         Balance $balanceRepository,
         Stats $statsRepository,
-        Tier $tierRepository
+        Tier $tierRepository,
+        ImageService $imageService
     ) {
 
         $this->mobileDetect = $mobileDetect;
@@ -109,6 +113,8 @@ class RepositoryManager implements RepositoryManagerInterface
         $this->statsRepository = $statsRepository;
 
         $this->tierRepository = $tierRepository;
+
+        $this->imageService = $imageService;
 
     }
 
@@ -261,6 +267,10 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function getSessionId($sessionInfo, $updateLastActivity) {
         return $this->sessionRepository->getCurrentId($sessionInfo, $updateLastActivity);
+    }
+
+    public function getImageIdAndUserId($fileName) {
+        return $this->imageService->getImageIdAndUserId($fileName);
     }
 
     public function getSessionLog($uuid, $results = true) {
