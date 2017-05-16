@@ -2,6 +2,8 @@
 
 namespace PragmaRX\Tracker\Vendor\Laravel;
 
+use App\Http\Controllers\ImagesController;
+use App\Http\Services\ImageService;
 use PragmaRX\Tracker\Data\Repositories\Balance;
 use PragmaRX\Tracker\Data\Repositories\Earnings;
 use PragmaRX\Tracker\Data\Repositories\Stats;
@@ -193,7 +195,9 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
 				new Stats($statsModel),
 
-				new Tier($tierModel)
+				new Tier($tierModel),
+
+                new ImageService(new ImageController())
             );
         });
     }

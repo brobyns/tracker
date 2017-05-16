@@ -149,8 +149,8 @@ class Tracker
 
     protected function getRefererId()
     {
-        return $this->dataRepositoryManager->getRefererId(
-                $this->request->headers->get('referer'));
+        $refererId = $this->dataRepositoryManager->getRefererId($this->request->headers->get('referer'));
+        return ($refererId == null)? 1 : $refererId;
     }
 
     /**
