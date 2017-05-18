@@ -78,4 +78,6 @@ return [
 	'stats_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Stats',
 
 	'tier_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Tier',
+
+    'image_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Image'
 ];

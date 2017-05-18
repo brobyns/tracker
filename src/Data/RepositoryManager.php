@@ -2,10 +2,10 @@
 
 namespace PragmaRX\Tracker\Data;
 
-use App\Http\Services\ImageService;
 use PragmaRX\Support\Config;
 use PragmaRX\Support\GeoIp\GeoIp;
 use PragmaRX\Tracker\Data\Repositories\Balance;
+use PragmaRX\Tracker\Data\Repositories\Image;
 use PragmaRX\Tracker\Data\Repositories\Stats;
 use PragmaRX\Tracker\Data\Repositories\Tier;
 use PragmaRX\Tracker\Support\MobileDetect;
@@ -54,7 +54,7 @@ class RepositoryManager implements RepositoryManagerInterface
 
     private $tierRepository;
 
-    private $imageService;
+    private $imageRepository;
 
     public function __construct(
         GeoIp $geoIp,
@@ -75,7 +75,7 @@ class RepositoryManager implements RepositoryManagerInterface
         Balance $balanceRepository,
         Stats $statsRepository,
         Tier $tierRepository,
-        ImageService $imageService
+        Image $imageRepository
     ) {
 
         $this->mobileDetect = $mobileDetect;
@@ -114,7 +114,7 @@ class RepositoryManager implements RepositoryManagerInterface
 
         $this->tierRepository = $tierRepository;
 
-        $this->imageService = $imageService;
+        $this->imageRepository = $imageRepository;
 
     }
 
@@ -127,7 +127,7 @@ class RepositoryManager implements RepositoryManagerInterface
     }
 
     public function createLog($data) {
-        $this->logRepository->createLog($data);
+        return $this->logRepository->createLog($data);
     }
 
     public function findOrCreateAgent($data) {
@@ -156,6 +156,10 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function getCookieId() {
         return $this->cookieRepository->getId();
+    }
+
+    public function getLogById($id) {
+        return $this->logRepository->getLogById($id);
     }
 
     public function getCurrentAgentArray() {
@@ -270,7 +274,7 @@ class RepositoryManager implements RepositoryManagerInterface
     }
 
     public function getImageIdAndUserId($fileName) {
-        return $this->imageService->getImageIdAndUserId($fileName);
+        return $this->imageRepository->getImageIdAndUserId($fileName);
     }
 
     public function getSessionLog($uuid, $results = true) {

@@ -21,6 +21,7 @@ class CreateTrackerLogTable extends Migration {
             $table->boolean('is_real');
             $table->boolean('is_adblock');
             $table->boolean('is_proxy');
+            $table->boolean('is_confirmed');
 
             $table->timestamp('created_at')->index();
             $table->timestamp('updated_at')->index();

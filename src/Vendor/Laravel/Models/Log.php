@@ -17,7 +17,8 @@ class Log extends Base {
 		'geoip_id',
         'is_real',
         'is_adblock',
-        'is_proxy'
+        'is_proxy',
+        'is_confirmed'
 	);
 
 	public function session()

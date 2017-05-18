@@ -20,6 +20,10 @@ class Log extends Repository
 		return $query;
 	}
 
+	public function getLogById($id) {
+	    return $this->getModel()->where('id', $id)->first();
+    }
+
 	/**
 	 * @return null
 	 */

@@ -51,7 +51,7 @@ class Tracker
 
     public function boot()
     {
-        $this->track();
+        return $this->track();
     }
 
     public function allSessions()
@@ -143,7 +143,8 @@ class Tracker
             'geoip_id' => $this->getGeoIpId(),
             'is_adblock' => true,
             'is_real' => false,
-            'is_proxy' => $this->isProxy()
+            'is_proxy' => $this->isProxy(),
+            'is_confirmed' => false
         ];
     }
 
@@ -262,16 +263,19 @@ class Tracker
     public function track()
     {
         $log = $this->getLogData();
-        $this->dataRepositoryManager->createLog($log);
+        return $this->dataRepositoryManager->createLog($log);
+    }
 
-        $tier = $this->dataRepositoryManager->getTier($log['geoip_id']);
+    public function confirmView() {
+        $log = $this->dataRepositoryManager->getLogById($this->request->get('log'));
+        $tier = $this->dataRepositoryManager->getTier($log->geoip_id);
         $clientIp = $this->request->getClientIp();
 
-        if ($this->isIpUnique($log['user_id'], $clientIp))
+        if ($this->isIpUnique($log->user_id, $clientIp))
         {
-            $this->dataRepositoryManager->updateStatsForImage($log['image_id'], $tier->id, $tier->rate);
-            $this->dataRepositoryManager->updateEarningsForUser($log['user_id'], $tier->id, $tier->rate);
-            $this->dataRepositoryManager->updateBalanceForUser($log['user_id'], $tier->rate);
+            $this->dataRepositoryManager->updateStatsForImage($log->image_id, $tier->id, $tier->rate);
+            $this->dataRepositoryManager->updateEarningsForUser($log->user_id, $tier->id, $tier->rate);
+            $this->dataRepositoryManager->updateBalanceForUser($log->user_id, $tier->rate);
         }
     }
 

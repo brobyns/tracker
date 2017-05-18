@@ -2,8 +2,6 @@
 
 namespace PragmaRX\Tracker\Vendor\Laravel;
 
-use App\Http\Controllers\ImagesController;
-use App\Http\Services\ImageService;
 use PragmaRX\Tracker\Data\Repositories\Balance;
 use PragmaRX\Tracker\Data\Repositories\Earnings;
 use PragmaRX\Tracker\Data\Repositories\Stats;
@@ -150,6 +148,8 @@ class ServiceProvider extends PragmaRXServiceProvider {
 		        $app['request']->server('HTTP_USER_AGENT')
 	        );
 
+	        $imageModel = $this->instantiateModel('image_model');
+
 	        return new RepositoryManager(
 	            new Geoip(),
 
@@ -197,7 +197,7 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
 				new Tier($tierModel),
 
-                new ImageService(new ImagesController())
+                new Image($imageModel)
             );
         });
     }
