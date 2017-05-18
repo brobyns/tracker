@@ -4,6 +4,7 @@ namespace PragmaRX\Tracker\Vendor\Laravel;
 
 use PragmaRX\Tracker\Data\Repositories\Balance;
 use PragmaRX\Tracker\Data\Repositories\Earnings;
+use PragmaRX\Tracker\Data\Repositories\Image;
 use PragmaRX\Tracker\Data\Repositories\Stats;
 use PragmaRX\Tracker\Data\Repositories\Tier;
 use PragmaRX\Tracker\Tracker;
