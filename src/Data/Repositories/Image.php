@@ -11,7 +11,7 @@ class Image extends Repository {
     }
 
     public function getImageIdAndUserId($filename) {
-        return $this
+        return $this->getModel()
             ->where('file_name', $filename)
             ->select('id', 'user_id')->first();
     }
