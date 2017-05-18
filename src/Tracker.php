@@ -266,8 +266,8 @@ class Tracker
         return $this->dataRepositoryManager->createLog($log);
     }
 
-    public function confirmView() {
-        $log = $this->dataRepositoryManager->getLogById($this->request->get('log'));
+    public function confirmView(Request $request) {
+        $log = $this->dataRepositoryManager->getLogById($request->get('log_id'));
         $tier = $this->dataRepositoryManager->getTier($log->geoip_id);
         $clientIp = $this->request->getClientIp();
 
