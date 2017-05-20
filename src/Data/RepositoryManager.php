@@ -130,6 +130,10 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->logRepository->createLog($data);
     }
 
+    public function updateLog($data, $model) {
+        return $this->logRepository->create($data, $model);
+    }
+
     public function findOrCreateAgent($data) {
         return $this->agentRepository->findOrCreate($data, ['name']);
     }
