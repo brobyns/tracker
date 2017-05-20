@@ -273,9 +273,9 @@ class Tracker
         if ($this->isIpUnique($log->user_id, $clientIp))
         {
             $tier = $this->dataRepositoryManager->getTier($log->geoip_id);
-            $this->dataRepositoryManager->updateLog($log, ['is_adblock' => $request->get('is_adblock'),
-                                                          ['is_real' => $request->get('is_real'),
-                                                           'is_confirmed' => true]]);
+            $this->dataRepositoryManager->updateLog(['is_adblock' => $request->get('is_adblock'),
+                                                    ['is_real' => $request->get('is_real'),
+                                                     'is_confirmed' => true]], $log);
 
             $this->dataRepositoryManager->updateStatsForImage($log->image_id, $tier->id, $tier->rate);
             $this->dataRepositoryManager->updateEarningsForUser($log->user_id, $tier->id, $tier->rate);
