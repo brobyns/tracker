@@ -21,7 +21,7 @@ class Log extends Repository
 	}
 
 	public function getLogById($id) {
-	    return $this->getModel()->where('id', $id)->first();
+	    return $this->getModel()->find($id);
     }
 
 	/**
@@ -91,4 +91,15 @@ class Log extends Repository
 
 		$this->getModel()->delete();
 	}
+
+	public function update($log, $attributes) {
+        foreach ($attributes as $attribute => $value)
+        {
+            if (in_array($attribute, $log->getFillable()))
+            {
+                $log->{$attribute} = $value;
+            }
+        }
+        $log->save();
+    }
 }
