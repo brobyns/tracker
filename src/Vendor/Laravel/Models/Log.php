@@ -114,7 +114,7 @@ class Log extends Base {
 				$this->getConnection()->raw('DATE(tracker_log.created_at) as date, tiers.name as tier,
 					count(*) as value'))
 			->groupBy(
-				Log::getConnection()->raw('tier')
+				Log::getConnection()->raw('tier, date')
 			)
 			->last10Days('tracker_log')
 			->orderBy('tiers.id');
