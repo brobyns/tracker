@@ -75,7 +75,7 @@ class Log extends Base {
 				$this->getConnection()->raw('tracker_geoip.country_code as code,
 					tracker_geoip.country_name as name, count(*) as value'))
 			->groupBy(
-				Log::getConnection()->raw('tracker_geoip.country_code', 'tracker_geoip.country_name')
+				Log::getConnection()->raw('tracker_geoip.country_code, tracker_geoip.country_name')
 			)
 			->last10Days('tracker_log')
             ->orderBy('value');
