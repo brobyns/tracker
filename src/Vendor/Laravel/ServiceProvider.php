@@ -24,14 +24,17 @@ use PragmaRX\Tracker\Data\Repositories\Session;
 use PragmaRX\Tracker\Data\Repositories\GeoIpRepository;
 use PragmaRX\Support\ServiceProvider as PragmaRXServiceProvider;
 use PragmaRX\Tracker\Vendor\Laravel\Artisan\Tables as TablesCommand;
+use PragmaRX\Tracker\Vendor\Laravel\Artisan\UpdateGeoIp;
+use PragmaRX\Tracker\Repositories\Message as MessageRepository;
 
-class ServiceProvider extends PragmaRXServiceProvider {
+class ServiceProvider extends PragmaRXServiceProvider
+{
 
-	protected $packageVendor = 'pragmarx';
+    protected $packageVendor = 'pragmarx';
 
-	protected $packageName = 'tracker';
+    protected $packageName = 'tracker';
 
-	protected $packageNameCapitalized = 'Tracker';
+    protected $packageNameCapitalized = 'Tracker';
 
     /**
      * Indicates if loading of the provider is deferred.
@@ -40,16 +43,16 @@ class ServiceProvider extends PragmaRXServiceProvider {
      */
     protected $defer = false;
 
-	private $tracker;
+    private $tracker;
 
-	/**
+    /**
      * Bootstrap the application events.
      *
      * @return void
      */
     public function boot()
     {
-	    parent::boot();
+        parent::boot();
     }
 
     /**
@@ -59,7 +62,7 @@ class ServiceProvider extends PragmaRXServiceProvider {
      */
     public function register()
     {
-	    parent::register();
+        parent::register();
 
         $this->registerRepositories();
 
@@ -67,7 +70,9 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
         $this->registerTablesCommand();
 
-        $this->commands('tracker.tables.command');
+        $this->registerUpdateGeoIpCommand();
+
+        $this->registerMessageRepository();
     }
 
     /**
@@ -88,31 +93,27 @@ class ServiceProvider extends PragmaRXServiceProvider {
      */
     private function registerTracker()
     {
-        $this->app->singleton('tracker', function ($app)
-        {
+        $this->app->singleton('tracker', function ($app) {
             $app['tracker.loaded'] = true;
 
             return new Tracker(
-                                    $app['tracker.config'],
-                                    $app['tracker.repositories'],
-                                    $app['request'],
-                                    $app['router'],
-                                    $app['log'],
-                                    $app
-                                );
+                $app['tracker.config'],
+                $app['tracker.repositories'],
+                $app['request'],
+                $app['router'],
+                $app['log'],
+                $app,
+                $app['tracker.messages']
+            );
         });
     }
 
     public function registerRepositories()
     {
-        $this->app->singleton('tracker.repositories', function ($app)
-        {
-            try
-            {
+        $this->app->singleton('tracker.repositories', function ($app) {
+            try {
                 $uaParser = new UserAgentParser($app->make('path.base'));
-            }
-            catch (\Exception $exception)
-            {
+            } catch (\Exception $exception) {
                 $uaParser = null;
             }
 
@@ -126,45 +127,45 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
             $cookieModel = $this->instantiateModel('cookie_model');
 
-	        $domainModel = $this->instantiateModel('domain_model');
+            $domainModel = $this->instantiateModel('domain_model');
 
-	        $refererModel = $this->instantiateModel('referer_model');
+            $refererModel = $this->instantiateModel('referer_model');
 
-	        $refererSearchTermModel = $this->instantiateModel('referer_search_term_model');
+            $refererSearchTermModel = $this->instantiateModel('referer_search_term_model');
 
-	        $geoipModel = $this->instantiateModel('geoip_model');
+            $geoipModel = $this->instantiateModel('geoip_model');
 
-	        $earningModel = $this->instantiateModel('earnings_model');
+            $earningModel = $this->instantiateModel('earnings_model');
 
-			$balanceModel = $this->instantiateModel('balance_model');
+            $balanceModel = $this->instantiateModel('balance_model');
 
-			$statsModel = $this->instantiateModel('stats_model');
+            $statsModel = $this->instantiateModel('stats_model');
 
-			$tierModel = $this->instantiateModel('tier_model');
+            $tierModel = $this->instantiateModel('tier_model');
 
-	        $logRepository = new Log($logModel);
+            $logRepository = new Log($logModel);
 
-	        $crawlerDetect = new CrawlerDetector(
-		        $app['request']->headers->all(),
-		        $app['request']->server('HTTP_USER_AGENT')
-	        );
+            $crawlerDetect = new CrawlerDetector(
+                $app['request']->headers->all(),
+                $app['request']->server('HTTP_USER_AGENT')
+            );
 
-	        $imageModel = $this->instantiateModel('image_model');
+            $imageModel = $this->instantiateModel('image_model');
 
-	        return new RepositoryManager(
-	            new Geoip(),
+            return new RepositoryManager(
+                new Geoip(),
 
-	            new MobileDetect,
+                new MobileDetect,
 
-	            $uaParser,
+                $uaParser,
 
-	            $app['session.store'],
+                $app['session.store'],
 
-	            $app['tracker.config'],
+                $app['tracker.config'],
 
                 new Session($sessionModel,
-                            $app['tracker.config'],
-                            new PhpSession()),
+                    $app['tracker.config'],
+                    new PhpSession()),
 
                 $logRepository,
 
@@ -173,14 +174,14 @@ class ServiceProvider extends PragmaRXServiceProvider {
                 new Device($deviceModel),
 
                 new Cookie($cookieModel,
-                            $app['tracker.config'],
-                            $app['request'],
-                            $app['cookie']),
+                    $app['tracker.config'],
+                    $app['request'],
+                    $app['cookie']),
 
                 new Domain($domainModel),
 
-	            new Referer(
-	                $refererModel,
+                new Referer(
+                    $refererModel,
                     $refererSearchTermModel,
                     $this->getAppUrl(),
                     $app->make('PragmaRX\Tracker\Support\RefererParser')
@@ -188,82 +189,99 @@ class ServiceProvider extends PragmaRXServiceProvider {
 
                 new GeoIpRepository($geoipModel),
 
-		        $crawlerDetect,
+                $crawlerDetect,
 
-				new Earnings($earningModel),
+                new Earnings($earningModel),
 
-				new Balance($balanceModel),
+                new Balance($balanceModel),
 
-				new Stats($statsModel),
+                new Stats($statsModel),
 
-				new Tier($tierModel),
+                new Tier($tierModel),
 
                 new Image($imageModel)
             );
         });
     }
 
-	private function registerTablesCommand()
-	{
-        $this->app->singleton('tracker.tables.command', function ($app)
-		{
-			return new TablesCommand();
-		});
-	}
+    protected function registerUpdateGeoIpCommand()
+    {
+        $this->app->singleton('tracker.updategeoip.command', function ($app) {
+            return new UpdateGeoIp();
+        });
 
-	private function instantiateModel($modelName)
-	{
-		$model = $this->getConfig($modelName);
+        $this->commands('tracker.updategeoip.command');
+    }
 
-		if ( ! $model)
-		{
-			$message = "Tracker: Model not found for '$modelName'.";
+    /**
+     * Register the message repository.
+     */
+    protected function registerMessageRepository()
+    {
+        $this->app->singleton('tracker.messages', function () {
+            return new MessageRepository();
+        });
+    }
 
-			$this->app['log']->error($message);
+    private function registerTablesCommand()
+    {
+        $this->app->singleton('tracker.tables.command', function ($app) {
+            return new TablesCommand();
+        });
 
-			throw new \Exception($message);
-		}
+        $this->commands('tracker.tables.command');
+    }
+
+    private function instantiateModel($modelName)
+    {
+        $model = $this->getConfig($modelName);
+
+        if (!$model) {
+            $message = "Tracker: Model not found for '$modelName'.";
+
+            $this->app['log']->error($message);
+
+            throw new \Exception($message);
+        }
 
         $model = new $model;
 
         $model->setConfig($this->app['tracker.config']);
 
-        if ($connection = $this->getConfig('connection'))
-        {
+        if ($connection = $this->getConfig('connection')) {
             $model->setConnection($connection);
         }
 
-		return $model;
-	}
+        return $model;
+    }
 
-	/**
-	 * Get the current package directory.
-	 *
-	 * @return string
-	 */
-	public function getPackageDir()
-	{
-		return __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..';
-	}
+    /**
+     * Get the current package directory.
+     *
+     * @return string
+     */
+    public function getPackageDir()
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
+    }
 
-	public function getTracker()
-	{
-		if ( ! $this->tracker)
-		{
-			$this->tracker = $this->app['tracker'];
-		}
+    public function getTracker()
+    {
+        if (!$this->tracker) {
+            $this->tracker = $this->app['tracker'];
+        }
 
-		return $this->tracker;
-	}
+        return $this->tracker;
+    }
 
-	public function getRootDirectory()
-	{
-		return __DIR__.'/../..';
-	}
+    public function getRootDirectory()
+    {
+        return __DIR__ . '/../..';
+    }
 
-	private function getAppUrl()
-	{
-		return $this->app['request']->url();
-	}
+    private function getAppUrl()
+    {
+        return $this->app['request']->url();
+    }
 
 }

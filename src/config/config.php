@@ -2,6 +2,7 @@
 
 return [
 
+    'geoip_database_path' => __DIR__.'/geoip',
 	/**
 	 * What are the names of the id columns on your system?
 	 *
