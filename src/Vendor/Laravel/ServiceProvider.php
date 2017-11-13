@@ -153,7 +153,7 @@ class ServiceProvider extends PragmaRXServiceProvider
             $imageModel = $this->instantiateModel('image_model');
 
             return new RepositoryManager(
-                new Geoip(),
+                new Geoip($this->getConfig('geoip_database_path')),
 
                 new MobileDetect,
 
