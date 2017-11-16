@@ -2,6 +2,8 @@
 
 namespace PragmaRX\Tracker\Vendor\Laravel\Models;
 
+use Carbon\Carbon;
+
 class Stats extends Base
 {
     protected $table = 'stats';
