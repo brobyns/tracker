@@ -15,4 +15,13 @@ class Image extends Repository {
             ->where('file_name', $filename)
             ->select('id', 'user_id')->first();
     }
+
+    public function updateImageViewsAndEarnings($imageId, $amount) {
+        $image = $this->newQuery()->find($imageId);
+        if ($image) {
+            $image->views++;
+            $image->amount += $amount;
+        }
+        $image->save();
+    }
 }

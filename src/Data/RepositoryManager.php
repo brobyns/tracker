@@ -353,6 +353,7 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function updateStatsForImage($imageId, $tierId, $amount) {
         $this->statsRepository->updateStatsForImage($imageId, $tierId, $amount);
+        $this->imageRepository->updateImageViewsAndEarnings($imageId, $amount);
     }
 
 }
