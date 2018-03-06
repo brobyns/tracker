@@ -192,7 +192,7 @@ class Tracker
     }
 
     public function getImageIdAndUserId() {
-        $fileName = $this->request->path();
+        $fileName = basename($this->request->path());
         return $this->dataRepositoryManager->getImageIdAndUserId($fileName);
     }
 
