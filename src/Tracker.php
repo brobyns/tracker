@@ -192,8 +192,8 @@ class Tracker
     }
 
     public function getImageIdAndUserId() {
-        $fileName = basename($this->request->path());
-        return $this->dataRepositoryManager->getImageIdAndUserId($fileName);
+        $uuid = basename($this->request->path());
+        return $this->dataRepositoryManager->getImageIdAndUserId($uuid);
     }
 
     public function isRobot()

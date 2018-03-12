@@ -277,8 +277,8 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->sessionRepository->getCurrentId($sessionInfo, $updateLastActivity);
     }
 
-    public function getImageIdAndUserId($fileName) {
-        return $this->imageRepository->getImageIdAndUserId($fileName);
+    public function getImageIdAndUserId($uuid) {
+        return $this->imageRepository->getImageIdAndUserId($uuid);
     }
 
     public function getSessionLog($uuid, $results = true) {
