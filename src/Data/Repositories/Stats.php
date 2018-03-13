@@ -22,10 +22,11 @@ class Stats extends Repository {
         return $this->getModel()->statsForUser($userId);
     }
 
-    public function updateStatsForImage($imageId, $tierId, $amount)
+    public function updateStatsForImage($imageId, $userId, $tierId, $amount)
     {
         $stats = $this->newQuery()
             ->where('image_id', $imageId)
+            ->where('user_id', $userId)
             ->where('tier_id', $tierId)
             ->where('date', Carbon::today())->first();
 

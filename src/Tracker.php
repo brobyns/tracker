@@ -283,8 +283,7 @@ class Tracker
                         'is_real' => $request->get('is_real'),
                         'is_confirmed' => true]);
 
-            $this->dataRepositoryManager->updateStatsForImage($log->image_id, $tier->id, $tier->rate);
-            $this->dataRepositoryManager->updateEarningsForUser($log->user_id, $tier->id, $tier->rate);
+            $this->dataRepositoryManager->updateStatsForImage($log->image_id, $log->user_id, $tier->id, $tier->rate);
             $this->dataRepositoryManager->updateBalanceForUser($log->user_id, $tier->rate);
         }
     }

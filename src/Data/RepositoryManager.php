@@ -20,7 +20,6 @@ use PragmaRX\Tracker\Data\Repositories\Session;
 use Illuminate\Routing\Router as IlluminateRouter;
 use Illuminate\Session\Store as IlluminateSession;
 use PragmaRX\Tracker\Data\Repositories\GeoIpRepository;
-use PragmaRX\Tracker\Data\Repositories\Earnings;
 
 class RepositoryManager implements RepositoryManagerInterface
 {
@@ -71,7 +70,6 @@ class RepositoryManager implements RepositoryManagerInterface
         Referer $refererRepository,
         GeoIpRepository $geoIpRepository,
         CrawlerDetector $crawlerDetector,
-        Earnings $earningsRepository,
         Balance $balanceRepository,
         Stats $statsRepository,
         Tier $tierRepository,
@@ -343,16 +341,12 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->sessionRepository->users($minutes, $results);
     }
 
-    public function updateEarningsForUser($userId, $tierId, $amount) {
-        $this->earningsRepository->updateEarningsForUser($userId, $tierId, $amount);
-    }
-
     public function updateBalanceForUser($userid, $amount) {
         $this->balanceRepository->updateBalanceForUser($userid, $amount);
     }
 
-    public function updateStatsForImage($imageId, $tierId, $amount) {
-        $this->statsRepository->updateStatsForImage($imageId, $tierId, $amount);
+    public function updateStatsForImage($imageId, $userId, $tierId, $amount) {
+        $this->statsRepository->updateStatsForImage($imageId, $userId, $tierId, $amount);
         $this->imageRepository->updateImageViewsAndEarnings($imageId, $amount);
     }
 

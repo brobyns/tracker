@@ -46,7 +46,7 @@ class Stats extends Base
                 $join->on('stats.date', '=', 'calendar.date');
             })
             ->select($this->getConnection()->raw('calendar.date, tier_id as tier,
-					SUM(stats.views) as views, SUM(stats.amount) / 100000 as earnings'))
+					SUM(stats.views) as views, SUM(stats.earnings) / 100000 as earnings'))
             ->groupBy('calendar.date')
             ->groupBy('tier')
             ->where('calendar.date', '>=', Carbon::now()->startOfDay()->subDays(10))
