@@ -36,6 +36,7 @@ class Stats extends Repository {
         } else {
             $stats = $this->newModel();
             $stats->image_id = $imageId;
+            $stats->user_id = $userId;
             $stats->tier_id = $tierId;
             $stats->views = 1;
             $stats->earnings = $amount;
