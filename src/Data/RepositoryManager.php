@@ -45,8 +45,6 @@ class RepositoryManager implements RepositoryManagerInterface
      */
     private $crawlerDetector;
 
-    private $earningsRepository;
-
     private $balanceRepository;
 
     private $statsRepository;
@@ -103,8 +101,6 @@ class RepositoryManager implements RepositoryManagerInterface
         $this->geoIpRepository = $geoIpRepository;
 
         $this->crawlerDetector = $crawlerDetector;
-
-        $this->earningsRepository = $earningsRepository;
 
         $this->balanceRepository = $balanceRepository;
 

@@ -3,7 +3,6 @@
 namespace PragmaRX\Tracker\Vendor\Laravel;
 
 use PragmaRX\Tracker\Data\Repositories\Balance;
-use PragmaRX\Tracker\Data\Repositories\Earnings;
 use PragmaRX\Tracker\Data\Repositories\Image;
 use PragmaRX\Tracker\Data\Repositories\Stats;
 use PragmaRX\Tracker\Data\Repositories\Tier;
@@ -135,8 +134,6 @@ class ServiceProvider extends PragmaRXServiceProvider
 
             $geoipModel = $this->instantiateModel('geoip_model');
 
-            $earningModel = $this->instantiateModel('earnings_model');
-
             $balanceModel = $this->instantiateModel('balance_model');
 
             $statsModel = $this->instantiateModel('stats_model');
@@ -190,8 +187,6 @@ class ServiceProvider extends PragmaRXServiceProvider
                 new GeoIpRepository($geoipModel),
 
                 $crawlerDetect,
-
-                new Earnings($earningModel),
 
                 new Balance($balanceModel),
 

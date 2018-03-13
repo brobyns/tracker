@@ -72,8 +72,6 @@ return [
 
     'geoip_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\GeoIp',
 
-	'earnings_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Earnings',
-
 	'balance_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Balance',
 
 	'stats_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Stats',
