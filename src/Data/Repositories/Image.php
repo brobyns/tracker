@@ -21,7 +21,7 @@ class Image extends Repository {
         $image = $this->newQuery()->find($imageId);
         if ($image) {
             $image->views++;
-            $image->amount += $amount;
+            $image->earnings += $amount;
         }
         $image->save();
     }

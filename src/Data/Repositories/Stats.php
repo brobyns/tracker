@@ -31,13 +31,13 @@ class Stats extends Repository {
 
         if ($stats) {
             $stats->views++;
-            $stats->amount += $amount;
+            $stats->earnings += $amount;
         } else {
             $stats = $this->newModel();
             $stats->image_id = $imageId;
             $stats->tier_id = $tierId;
             $stats->views = 1;
-            $stats->amount = $amount;
+            $stats->earnings = $amount;
             $stats->date = Carbon::today();
         }
         $stats->save();
