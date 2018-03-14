@@ -140,6 +140,10 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->tierRepository->getTier($geoipId);
     }
 
+    public function getImage($imageId) {
+        return $this->imageRepository->getImage($imageId);
+    }
+
     public function findOrCreateSession($data) {
         return $this->sessionRepository->findOrCreate($data, ['uuid']);
     }

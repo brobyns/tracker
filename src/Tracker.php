@@ -273,6 +273,7 @@ class Tracker
 
     public function confirmView(Request $request) {
         $log = $this->dataRepositoryManager->getLogById($request->get('log_id'));
+        $image = $this->dataRepositoryManager->getImage($log->image_id);
         $clientIp = $this->request->getClientIp();
 
         if ($this->isIpUnique($log->user_id, $clientIp))
@@ -286,6 +287,7 @@ class Tracker
             $this->dataRepositoryManager->updateStatsForImage($log->image_id, $log->user_id, $tier->id, $tier->rate);
             $this->dataRepositoryManager->updateBalanceForUser($log->user_id, $tier->rate);
         }
+        return $image->image_name;
     }
 
     public function userDevices($minutes, $user_id = null, $results = true)

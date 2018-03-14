@@ -10,6 +10,12 @@ class Image extends Repository {
         parent::__construct($model);
     }
 
+    public function getImage($imageId) {
+        return $this->getModel()
+            ->where('id', $imageId)
+            ->first();
+    }
+
     public function getImageIdAndUserId($uuid) {
         return $this->getModel()
             ->where('uuid', $uuid)
