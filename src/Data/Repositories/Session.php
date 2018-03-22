@@ -62,14 +62,22 @@ class Session extends Repository {
     {
         $data = $this->getSessionData();
 
-        return  isset($data['user_id']) &&
-                $data['user_id'] === $this->sessionInfo['user_id'] &&
-
-                isset($data['client_ip']) &&
-                $data['client_ip'] === $this->sessionInfo['client_ip'] &&
-
-                isset($data['user_agent']) &&
-                $data['user_agent'] === $this->sessionInfo['user_agent'];
+        if (isset($data['user_id'])) {
+            if ($data['user_id'] !== $this->sessionInfo['user_id']) {
+                return false;
+            }
+        }
+        if (isset($data['client_ip'])) {
+            if ($data['client_ip'] !== $this->sessionInfo['client_ip']) {
+                return false;
+            }
+        }
+        if (isset($data['user_agent'])) {
+            if ($data['user_agent'] !== $this->sessionInfo['user_agent']) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private function sessionIsKnownOrCreateSession()
@@ -94,9 +102,16 @@ class Session extends Repository {
 
     private function sessionIsKnown()
     {
-        return $this->session->has($this->getSessionIdentifier())
-                && $this->getSessionData('uuid') == $this->getSystemSessionId()
-                && $this->where('uuid', $this->getSessionData('uuid'))->first();
+        if (!$this->session->has($this->getSessionKey())) {
+            return false;
+        }
+        if (!$this->getSessionData('uuid') == $this->getSystemSessionId()) {
+            return false;
+        }
+        if (!$this->findByUuid($this->getSessionData('uuid'))) {
+            return false;
+        }
+        return true;
     }
 
     private function ensureSessionDataIsComplete()
