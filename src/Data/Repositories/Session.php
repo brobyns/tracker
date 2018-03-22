@@ -7,19 +7,20 @@ use PragmaRX\Support\Config;
 use Ramsey\Uuid\Uuid as UUID;
 use PragmaRX\Support\PhpSession;
 
-class Session extends Repository {
+class Session extends Repository
+{
 
-	private $config;
+    private $config;
 
-	private $session;
+    private $session;
 
-	private $sessionInfo;
+    private $sessionInfo;
 
-	public function __construct($model, Config $config, PhpSession $session)
+    public function __construct($model, Config $config, PhpSession $session)
     {
         $this->config = $config;
 
-	    $this->session = $session;
+        $this->session = $session;
 
         parent::__construct($model);
     }
@@ -40,8 +41,7 @@ class Session extends Repository {
     {
         $this->generateSession($sessinInfo);
 
-        if ($this->sessionIsKnownOrCreateSession())
-        {
+        if ($this->sessionIsKnownOrCreateSession()) {
             $this->ensureSessionDataIsComplete();
         }
     }
@@ -50,12 +50,11 @@ class Session extends Repository {
     {
         $this->sessionInfo = $sessionInfo;
 
-        if ( ! $this->sessionIsReliable())
-        {
+        if (!$this->sessionIsReliable()) {
             $this->regenerateSystemSession();
         }
 
-	    $this->checkSessionUuid();
+        $this->checkSessionUuid();
     }
 
     private function sessionIsReliable()
@@ -82,17 +81,14 @@ class Session extends Repository {
 
     private function sessionIsKnownOrCreateSession()
     {
-        if ( ! $known = $this->sessionIsKnown())
-        {
+        if (!$known = $this->sessionIsKnown()) {
             $this->sessionSetId($this->findOrCreate($this->sessionInfo, array('uuid')));
-        }
-        else
-        {
-	        $session = $this->find($this->getSessionData('id'));
+        } else {
+            $session = $this->find($this->getSessionData('id'));
 
-	        $session->updated_at = Carbon::now();
+            $session->updated_at = Carbon::now();
 
-	        $session->save();
+            $session->save();
 
             $this->sessionInfo['id'] = $this->getSessionData('id');
         }
@@ -117,28 +113,18 @@ class Session extends Repository {
     private function ensureSessionDataIsComplete()
     {
         $sessionData = $this->getSessionData();
-
         $wasComplete = true;
-
-        foreach ($this->sessionInfo as $key => $value)
-        {
-            if ($sessionData[$key] !== $value)
-            {
-                if ( ! isset($model))
-                {
+        foreach ($this->sessionInfo as $key => $value) {
+            if ($sessionData[$key] !== $value) {
+                if (!isset($model)) {
                     $model = $this->find($this->sessionInfo['id']);
                 }
-
                 $model->setAttribute($key, $value);
-
                 $model->save();
-
                 $wasComplete = false;
             }
         }
-
-        if (! $wasComplete)
-        {
+        if (!$wasComplete) {
             $this->storeSession();
         }
     }
@@ -151,7 +137,6 @@ class Session extends Repository {
     private function sessionSetId($id)
     {
         $this->sessionInfo['id'] = $id;
-
         $this->storeSession();
     }
 
@@ -163,41 +148,39 @@ class Session extends Repository {
     private function getSystemSessionId()
     {
         $sessionData = $this->getSessionData();
-
-        return isset($sessionData['uuid'])
-                ? $sessionData['uuid']
-                : (string) UUID::uuid4();
+        if (isset($sessionData['uuid'])) {
+            return $sessionData['uuid'];
+        }
+        return (string)UUID::uuid4();
     }
 
     private function regenerateSystemSession($data = null)
     {
-	    $data = $data ?: $this->getSessionData();
-
-        if (!$data)
-        {
-	        $this->resetSessionUuid($data);
-
-	        $this->sessionIsKnownOrCreateSession();
+        $data = $data ?: $this->getSessionData();
+        if (!$data) {
+            $this->resetSessionUuid($data);
+            $this->sessionIsKnownOrCreateSession();
         }
-
-	    return $this->sessionInfo;
+        return $this->sessionInfo;
     }
 
+    /**
+     * @param string $variable
+     */
     private function getSessionData($variable = null)
     {
-	    $id = $this->getSessionIdentifier();
-
-        $data = $this->session->get($id);
-
-        return $variable ? (isset($data[$variable]) ? $data[$variable] : null) : $data;
+        $data = $this->session->get($this->getSessionKey());
+        return $variable
+            ? (isset($data[$variable]) ? $data[$variable] : null)
+            : $data;
     }
 
     private function putSessionData($data)
     {
-        $this->session->put($this->getSessionIdentifier(), $data);
+        $this->session->put($this->getSessionKey(), $data);
     }
 
-    private function getSessionIdentifier()
+    private function getSessionKey()
     {
         return $this->config->get('tracker_session_name');
     }
@@ -205,15 +188,9 @@ class Session extends Repository {
     private function getSessions()
     {
         return $this
-	            ->newQuery()
-	            ->with('user')
-		        ->with('device')
-		        ->with('agent')
-		        ->with('referer')
-		        ->with('geoIp')
-		        ->with('log')
-		        ->with('cookie')
-	            ->orderBy('updated_at', 'desc');
+            ->newQuery()
+            ->with($this->relations)
+            ->orderBy('updated_at', 'desc');
     }
 
     public function all()
@@ -221,99 +198,84 @@ class Session extends Repository {
         return $this->getSessions()->get();
     }
 
-    public function last($minutes, $results)
+    public function last($minutes, $returnResults)
     {
-	    $query = $this
-		            ->getSessions()
-		            ->period($minutes);
-
-	    if ($results)
-	    {
-		    return $query->get();
-	    }
-
-	    return $query;
+        $query = $this
+            ->getSessions()
+            ->period($minutes);
+        if ($returnResults) {
+            $cacheKey = 'last-sessions';
+            $result = $this->cache->findCachedWithKey($cacheKey);
+            if (!$result) {
+                $result = $query->get();
+                $this->cache->cachePut($cacheKey, $result, 1); // cache only for 1 minute
+                return $result;
+            }
+            return $result;
+        }
+        return $query;
     }
 
-    public function userDevices($minutes, $user_id, $results) {
-        if ( ! $user_id)
-        {
+    public function userDevices($minutes, $user_id, $results)
+    {
+        if (!$user_id) {
             return [];
         }
-
         $sessions = $this
             ->getSessions()
             ->period($minutes)
             ->where('user_id', $user_id);
-
-        if ($results)
-        {
+        if ($results) {
             $sessions = $sessions->get()->pluck('device')->unique();
         }
-
         return $sessions;
     }
 
     public function users($minutes, $results)
     {
-         return $this->getModel()->users($minutes, $results);
+        return $this->getModel()->users($minutes, $results);
     }
 
-	public function getCurrent()
-	{
-		return $this->getModel();
-	}
+    public function getCurrent()
+    {
+        return $this->getModel();
+    }
 
-	public function updateSessionData($data)
-	{
-		$session = $this->checkIfUserChanged($data, $this->find($this->getSessionData('id')));
+    public function updateSessionData($data)
+    {
+        $session = $this->checkIfUserChanged($data, $this->find($this->getSessionData('id')));
+        foreach ($session->getAttributes() as $name => $value) {
+            if (isset($data[$name]) && $name !== 'id' && $name !== 'uuid') {
+                $session->{$name} = $data[$name];
+            }
+        }
+        $session->save();
+        return $data;
+    }
 
-		foreach($session->getAttributes() as $name => $value)
-		{
-			if (isset($data[$name]) && $name !== 'id' && $name !== 'uuid')
-			{
-				$session->{$name} = $data[$name];
-			}
-		}
+    private function checkIfUserChanged($data, $model)
+    {
+        if (!is_null($model->user_id) && !is_null($data['user_id']) && $data['user_id'] !== $model->user_id) {
+            $newSession = $this->regenerateSystemSession($data);
+            $model = $this->findByUuid($newSession['uuid']);
+        }
+        return $model;
+    }
 
-		$session->save();
+    private function checkSessionUuid()
+    {
+        if (!isset($this->sessionInfo['uuid']) || !$this->sessionInfo['uuid']) {
+            $this->sessionInfo['uuid'] = $this->getSystemSessionId();
+        }
+    }
 
-		return $data;
-	}
-
-	private function checkIfUserChanged($data, $model)
-	{
-		if ( ! is_null($model->user_id) && ! is_null($data['user_id']) && $data['user_id'] !== $model->user_id)
-		{
-			$newSession = $this->regenerateSystemSession($data);
-
-			$model = $this->findByUuid($newSession['uuid']);
-		}
-
-		return $model;
-	}
-
-	private function checkSessionUuid()
-	{
-		if ( ! isset($this->sessionInfo['uuid']) || ! $this->sessionInfo['uuid'])
-		{
-			$this->sessionInfo['uuid'] = $this->getSystemSessionId();
-		}
-	}
-
-	private function resetSessionUuid($data = null)
-	{
-		$this->sessionInfo['uuid'] = null;
-
-		$data = $data ?: $this->sessionInfo;
-
-		unset($data['uuid']);
-
-		$this->putSessionData($data);
-
-		$this->checkSessionUuid();
-
-		return $data;
-	}
-
+    private function resetSessionUuid($data = null)
+    {
+        $this->sessionInfo['uuid'] = null;
+        $data = $data ?: $this->sessionInfo;
+        unset($data['uuid']);
+        $this->putSessionData($data);
+        $this->checkSessionUuid();
+        return $data;
+    }
 }
