@@ -40,7 +40,7 @@ class Stats extends Base
             ->join('images', 'images.id', '=', 'stats.image_id')
             ->join('users', function ($join) use ($userId) {
                 $join->on('users.id', '=', 'images.user_id')
-                    ->where('user_id', $userId);
+                    ->where('images.user_id', $userId);
             })
             ->rightjoin('calendar', function ($join) {
                 $join->on('stats.date', '=', 'calendar.date');
