@@ -21,6 +21,7 @@ class CreateTrackerSessionsTable extends Migration {
             $table->bigInteger('referer_id')->unsigned()->nullable()->index();
             $table->bigInteger('cookie_id')->unsigned()->nullable()->index();
             $table->bigInteger('geoip_id')->unsigned()->nullable()->index();
+            $table->string('user_agent')->nullable();
             $table->boolean('is_robot');
 
             $table->timestamp('created_at')->index();
