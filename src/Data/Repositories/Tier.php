@@ -25,4 +25,11 @@ class Tier extends Repository {
             ->select('tiers.*')
             ->first();
     }
+
+    public function getTierByName($name)
+    {
+        return $this->model()
+            ->where('name', $name)
+            ->first();
+    }
 }

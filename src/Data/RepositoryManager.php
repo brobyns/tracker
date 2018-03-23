@@ -137,11 +137,19 @@ class RepositoryManager implements RepositoryManagerInterface
     }
 
     public function getTier($geoipId) {
-        return $this->tierRepository->getTier($geoipId);
+        $tier =  $this->tierRepository->getTier($geoipId);
+        if (is_null($tier)) {
+            $tier =  $this->tierRepository->getTierByName(config('fallback_tier_name'));
+        }
+        return $tier;
     }
 
     public function getImage($imageId) {
-        return $this->imageRepository->getImage($imageId);
+        $image = $this->imageRepository->getImage($imageId);
+        if (is_null($image)) {
+            throw new ResourceNotFoundException();
+        }
+        return $image;
     }
 
     public function findOrCreateSession($data) {

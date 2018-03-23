@@ -13,6 +13,7 @@ class Image extends Repository {
     public function getImage($imageId) {
         return $this->getModel()
             ->where('id', $imageId)
+            ->with('user')
             ->first();
     }
 

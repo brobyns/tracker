@@ -1,6 +1,10 @@
 <?php
 
 return [
+    /**
+     * Name of the tier that serves as a fallback if no tier is found
+     */
+    'fallback_tier_name' => 'D',
 
     'geoip_database_path' => __DIR__.'/geoip',
 	/**
