@@ -4,7 +4,7 @@ namespace PragmaRX\Tracker;
 
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Http\Request;
-use Illuminate\Log\Writer as Logger;
+use Psr\Log\LoggerInterface as Logger;
 use Illuminate\Routing\Router;
 use PragmaRX\Support\Config;
 use PragmaRX\Tracker\Data\RepositoryManager as DataRepositoryManager;
