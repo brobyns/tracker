@@ -90,7 +90,7 @@ class Log extends Base {
 			->join('tiers', 'tiers.id', '=', 'countries.tier_id')
 			->where('user_id', $userid)
 			->select(
-				$this->getConnection()->raw('DATE(tracker_log.created_at) as date, tiers.name as tier,
+				$this->getConnection()->raw('DATE(tracker_log.created_at) as date, tiers.tier_name as tier,
 					count(*) as value, SUM(tiers.rate) as earnings'))
 			->groupBy(
 				Log::getConnection()->raw('date')
@@ -111,7 +111,7 @@ class Log extends Base {
 			->join('tiers', 'tiers.id', '=', 'countries.tier_id')
 			->where('user_id', $userid)
 			->select(
-				$this->getConnection()->raw('DATE(tracker_log.created_at) as date, tiers.name as tier,
+				$this->getConnection()->raw('DATE(tracker_log.created_at) as date, tiers.tier_name as tier,
 					count(*) as value'))
 			->groupBy(
 				Log::getConnection()->raw('tier, date')
