@@ -29,7 +29,7 @@ class Tier extends Repository {
     public function getTierByName($name)
     {
         return $this->model()
-            ->where('tier_name', $name)
+            ->where('name', $name)
             ->first();
     }
 }
