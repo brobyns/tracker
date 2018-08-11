@@ -38,7 +38,8 @@ class Tracker
         Logger $logger,
         Laravel $laravel,
         MessageRepository $messageRepository
-    ) {
+    )
+    {
         $this->config = $config;
 
         $this->dataRepositoryManager = $dataRepositoryManager;
@@ -111,24 +112,25 @@ class Tracker
             : null;
     }
 
-    public function getDomainId($domain) {
+    public function getDomainId($domain)
+    {
         return $this->dataRepositoryManager->getDomainId($domain);
     }
 
     protected function getGeoIpId()
     {
-        return $this->dataRepositoryManager->getGeoIpId($this->request->getClientIp());
+        return $this->dataRepositoryManager->getGeoIpId($this->getClientIp());
     }
 
     protected function isProxy()
     {
         $client = new GuzzleHttp\Client();
         $response = $client->request('GET', 'http://www.shroomery.org/ythan/proxycheck.php', [
-        'query' => ['ip' => $this->request->getClientIp()]
+            'query' => ['ip' => $this->getClientIp()]
         ]);
 
-        if($response->getStatusCode() === 200) {
-            $stringBody = (string) $response->getBody();
+        if ($response->getStatusCode() === 200) {
+            $stringBody = (string)$response->getBody();
             return $stringBody === 'Y';
         }
         return false;
@@ -142,8 +144,8 @@ class Tracker
         $image = $this->getImageIdAndUserId();
         return [
             'session_id' => $this->getSessionId(true),
-            'image_id'  => $image->id,
-            'user_id'    => $image->user_id,
+            'image_id' => $image->id,
+            'user_id' => $image->user_id,
             'referer_id' => $this->getRefererId(),
             'geoip_id' => $this->getGeoIpId(),
             'is_adblock' => true,
@@ -156,7 +158,7 @@ class Tracker
     protected function getRefererId()
     {
         $refererId = $this->dataRepositoryManager->getRefererId($this->request->headers->get('referer'));
-        return ($refererId == null)? 1 : $refererId;
+        return ($refererId == null) ? 1 : $refererId;
     }
 
     /**
@@ -165,14 +167,14 @@ class Tracker
     protected function makeSessionData()
     {
         $sessionData = [
-            'user_id'    => $this->request->user() ? $this->request->user() : null,
-            'device_id'  => $this->getDeviceId(),
-            'client_ip'  => $this->request->getClientIp(),
-            'geoip_id'   => $this->getGeoIpId(),
-            'agent_id'   => $this->getAgentId(),
+            'user_id' => $this->request->user() ? $this->request->user() : null,
+            'device_id' => $this->getDeviceId(),
+            'client_ip' => $this->getClientIp(),
+            'geoip_id' => $this->getGeoIpId(),
+            'agent_id' => $this->getAgentId(),
             'referer_id' => $this->getRefererId(),
-            'cookie_id'  => $this->getCookieId(),
-            'is_robot'   => $this->isRobot(),
+            'cookie_id' => $this->getCookieId(),
+            'is_robot' => $this->isRobot(),
 
             // The key user_agent is not present in the sessions table, but
             // it's internally used to check if the user agent changed
@@ -191,7 +193,8 @@ class Tracker
         );
     }
 
-    public function getImageIdAndUserId() {
+    public function getImageIdAndUserId()
+    {
         $uuid = basename($this->request->path());
         return $this->dataRepositoryManager->getImageIdAndUserId($uuid);
     }
@@ -218,35 +221,43 @@ class Tracker
         return $this->dataRepositoryManager->pageViewsByCountry(Minutes::make($minutes), $results);
     }
 
-    public function pageViewsByRouteName($userid, $uniqueOnly) {
+    public function pageViewsByRouteName($userid, $uniqueOnly)
+    {
         return $this->dataRepositoryManager->pageViewsByRouteName($userid, $uniqueOnly);
     }
 
-    public function referersForUser($userid) {
+    public function referersForUser($userid)
+    {
         return $this->dataRepositoryManager->referersForUser($userid);
     }
 
-    public function countriesForUser($userid) {
+    public function countriesForUser($userid)
+    {
         return $this->dataRepositoryManager->countriesForUser($userid);
     }
 
-    public function tiersForUser($userid) {
+    public function tiersForUser($userid)
+    {
         return $this->dataRepositoryManager->tiersForUser($userid);
     }
 
-    public function statsForUser($userId) {
+    public function statsForUser($userId)
+    {
         return $this->dataRepositoryManager->statsForUser($userId);
     }
 
-    public function viewsAndEarningsForUser($userid) {
+    public function viewsAndEarningsForUser($userid)
+    {
         return $this->dataRepositoryManager->viewsAndEarningsForUser($userid);
     }
 
-    public function isIpUnique($userid, $clientIp) {
+    public function isIpUnique($userid, $clientIp)
+    {
         return $this->dataRepositoryManager->isIpUnique($userid, $clientIp);
     }
 
-    public function getRateForGeoipId($geoipId) {
+    public function getRateForGeoipId($geoipId)
+    {
         return $this->dataRepositoryManager->getRateForGeoipId($geoipId);
     }
 
@@ -271,18 +282,32 @@ class Tracker
         return $this->dataRepositoryManager->createLog($log);
     }
 
-    public function confirmView(Request $request) {
+    public function getClientIp()
+    {
+        foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
+            if (array_key_exists($key, $_SERVER) === true) {
+                foreach (explode(',', $_SERVER[$key]) as $ip) {
+                    $ip = trim($ip); // just to be safe
+                    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+                        return $ip;
+                    }
+                }
+            }
+        }
+    }
+
+    public function confirmView(Request $request)
+    {
         $log = $this->dataRepositoryManager->getLogById($request->get('log_id'));
         $image = $this->dataRepositoryManager->getImage($log->image_id);
-        $clientIp = $this->request->getClientIp();
+        $clientIp = $this->getClientIp();
 
-        if ($this->isIpUnique($log->user_id, $clientIp))
-        {
+        if ($this->isIpUnique($log->user_id, $clientIp)) {
             $tier = $this->dataRepositoryManager->getTier($log->geoip_id);
             $this->dataRepositoryManager->updateLog($log,
-                        ['is_adblock' => $request->get('is_adblock'),
-                        'is_real' => $request->get('is_real'),
-                        'is_confirmed' => true]);
+                ['is_adblock' => $request->get('is_adblock'),
+                    'is_real' => $request->get('is_real'),
+                    'is_confirmed' => true]);
 
             $this->dataRepositoryManager->updateStatsForImage($log->image_id, $log->user_id, $tier->id, $tier->rate);
             $this->dataRepositoryManager->updateBalanceForUser($log->user_id, $tier->rate);
@@ -313,6 +338,7 @@ class Tracker
     {
         return $this->messageRepository->getMessages();
     }
+
     /**
      * Update the GeoIp2 database.
      *
