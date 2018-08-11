@@ -139,7 +139,7 @@ class RepositoryManager implements RepositoryManagerInterface
     public function getTier($geoipId) {
         $tier =  $this->tierRepository->getTier($geoipId);
         if (is_null($tier)) {
-            $tier =  $this->tierRepository->getTierByName(config('fallback_tier_name'));
+            $tier =  $this->tierRepository->getTierByName($this->config->get('fallback_tier_name'));
         }
         return $tier;
     }
