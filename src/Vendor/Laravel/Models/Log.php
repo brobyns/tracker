@@ -52,7 +52,7 @@ class Log extends Base {
 			->get();
 	}
 
-	public function referersForUser($userId) {
+	public function referersForUser($userId, $startDate, $endDate) {
 		$query = $this
             ->join('tracker_referers', 'tracker_referers.id', '=', 'tracker_log.referer_id')
 			->where('user_id', $userId)
@@ -61,13 +61,13 @@ class Log extends Base {
             ->groupBy(
                 Log::getConnection()->raw('tracker_referers.host')
             )
-			->last10Days('tracker_log')
+			->range($startDate, $endDate, 'tracker_log')
             ->orderBy('count', 'desc');
 
         return $query->get();
 	}
 
-	public function countriesForUser($userid) {
+	public function countriesForUser($userid, $startDate, $endDate) {
 		$query = $this
 			->join('tracker_geoip', 'tracker_geoip.id', '=', 'tracker_log.geoip_id')
 			->where('user_id', $userid)
@@ -77,7 +77,7 @@ class Log extends Base {
 			->groupBy(
 				Log::getConnection()->raw('tracker_geoip.country_code, tracker_geoip.country_name')
 			)
-			->last10Days('tracker_log')
+            ->range($startDate, $endDate, 'tracker_log')
             ->orderBy('value');
 
 		return $query->get();
@@ -104,7 +104,7 @@ class Log extends Base {
 		return $query->get();
 	}
 
-	public function tiersForUser($userid) {
+	public function tiersForUser($userid, $startDate, $endDate) {
 		$query = $this
 			->join('tracker_geoip', 'tracker_geoip.id', '=', 'tracker_log.geoip_id')
 			->join('countries', 'countries.country_code', '=', 'tracker_geoip.country_code')
@@ -116,7 +116,7 @@ class Log extends Base {
 			->groupBy(
 				Log::getConnection()->raw('tier, date')
 			)
-			->last10Days('tracker_log')
+            ->range($startDate, $endDate, 'tracker_log')
 			->orderBy('tiers.id');
 
 		return $query->get();

@@ -2,8 +2,6 @@
 
 namespace PragmaRX\Tracker\Vendor\Laravel\Models;
 
-use Carbon\Carbon;
-
 class Stats extends Base
 {
     protected $table = 'stats';
@@ -34,7 +32,7 @@ class Stats extends Base
         return $value / 100000;
     }
 
-    public function statsForUser($userId)
+    public function statsForUser($userId, $startDate, $endDate)
     {
         return $this->newQuery()
             ->join('images', 'images.id', '=', 'stats.image_id')
@@ -49,8 +47,8 @@ class Stats extends Base
 					SUM(stats.views) as views, SUM(stats.earnings) / 100000 as earnings'))
             ->groupBy('calendar.date')
             ->groupBy('tier')
-            ->where('calendar.date', '>=', Carbon::now()->startOfDay()->subDays(10))
-            ->where('calendar.date', '<=', Carbon::now()->endOfDay())
+            ->where('calendar.date', '>=', $startDate)
+            ->where('calendar.date', '<=', $endDate)
             ->get();
     }
 }
