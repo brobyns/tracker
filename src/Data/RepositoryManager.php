@@ -309,20 +309,20 @@ class RepositoryManager implements RepositoryManagerInterface
         return $this->logRepository->pageViewsByRouteName($userid, $uniqueOnly);
     }
 
-    public function referersForUser($userid) {
-        return $this->logRepository->referersForUser($userid);
+    public function referersForUser($userid, $startDate, $endDate) {
+        return $this->logRepository->referersForUser($userid, $startDate, $endDate);
     }
 
-    public function countriesForUser($userid) {
-        return $this->logRepository->countriesForUser($userid);
+    public function countriesForUser($userid, $startDate, $endDate) {
+        return $this->logRepository->countriesForUser($userid, $startDate, $endDate);
     }
 
-    public function tiersForUser($userid) {
-        return $this->logRepository->tiersForUser($userid);
+    public function tiersForUser($userid, $startDate, $endDate) {
+        return $this->logRepository->tiersForUser($userid, $startDate, $endDate);
     }
 
-    public function statsForUser($userId) {
-        return $this->statsRepository->statsForUser($userId);
+    public function statsForUser($userId, $startDate, $endDate) {
+        return $this->statsRepository->statsForUser($userId, $startDate, $endDate);
     }
 
     public function viewsAndEarningsForUser($userid) {

@@ -226,24 +226,24 @@ class Tracker
         return $this->dataRepositoryManager->pageViewsByRouteName($userid, $uniqueOnly);
     }
 
-    public function referersForUser($userid)
+    public function referersForUser($userid, $startDate, $endDate)
     {
-        return $this->dataRepositoryManager->referersForUser($userid);
+        return $this->dataRepositoryManager->referersForUser($userid, $startDate, $endDate);
     }
 
-    public function countriesForUser($userid)
+    public function countriesForUser($userid, $startDate, $endDate)
     {
-        return $this->dataRepositoryManager->countriesForUser($userid);
+        return $this->dataRepositoryManager->countriesForUser($userid, $startDate, $endDate);
     }
 
-    public function tiersForUser($userid)
+    public function tiersForUser($userid, $startDate, $endDate)
     {
-        return $this->dataRepositoryManager->tiersForUser($userid);
+        return $this->dataRepositoryManager->tiersForUser($userid, $startDate, $endDate);
     }
 
-    public function statsForUser($userId)
+    public function statsForUser($userId, $startDate, $endDate)
     {
-        return $this->dataRepositoryManager->statsForUser($userId);
+        return $this->dataRepositoryManager->statsForUser($userId, $startDate, $endDate);
     }
 
     public function viewsAndEarningsForUser($userid)

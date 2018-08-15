@@ -64,17 +64,17 @@ class Log extends Repository
         return $this->getModel()->pageViewsByRouteName($userid, $uniqueOnly);
     }
 
-	public function referersForUser($userid)
+	public function referersForUser($userid, $startDate, $endDate)
 	{
-		return $this->getModel()->referersForUser($userid);
+		return $this->getModel()->referersForUser($userid, $startDate, $endDate);
 	}
 
-	public function countriesForUser($userid) {
-		return $this->getModel()->countriesForUser($userid);
+	public function countriesForUser($userid, $startDate, $endDate) {
+		return $this->getModel()->countriesForUser($userid, $startDate, $endDate);
 	}
 
-	public function tiersForUser($userid) {
-		return $this->getModel()->tiersForUser($userid);
+	public function tiersForUser($userid, $startDate, $endDate) {
+		return $this->getModel()->tiersForUser($userid, $startDate, $endDate);
 	}
 
 	public function viewsAndEarningsForUser($userid) {

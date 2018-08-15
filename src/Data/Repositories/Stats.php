@@ -18,8 +18,8 @@ class Stats extends Repository {
         parent::__construct($model);
     }
 
-    public function statsForUser($userId) {
-        return $this->getModel()->statsForUser($userId);
+    public function statsForUser($userId, $startDate, $endDate) {
+        return $this->getModel()->statsForUser($userId, $startDate, $endDate);
     }
 
     public function updateStatsForImage($imageId, $userId, $tierId, $amount)
