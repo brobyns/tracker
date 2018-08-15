@@ -47,6 +47,15 @@ class Base extends Eloquent {
 				->where($alias.'updated_at', '<=', $minutes->getEnd());
 	}
 
+    public function scopeRange($query, $start, $end, $alias = '')
+    {
+        $alias = $alias ? "$alias." : '';
+
+        return $query
+            ->where($alias.'updated_at', '>=', $start)
+            ->where($alias.'updated_at', '<=', $end);
+    }
+
 	public function scopeToday($query, $alias = '')
 	{
 		$alias = $alias ? "$alias." : '';
