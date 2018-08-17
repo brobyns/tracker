@@ -62,7 +62,7 @@ class Log extends Base
     {
         $query = $this
             ->join('tracker_referers', 'tracker_referers.id', '=', 'tracker_log.referer_id')
-            ->where('log.user_id', $userId)
+            ->where('tracker_log.user_id', $userId)
             ->unique()
             ->select(
                 $this->getConnection()->raw('count(*) as count, tracker_referers.host as referer'))
@@ -79,7 +79,7 @@ class Log extends Base
     {
         $query = $this
             ->join('tracker_geoip', 'tracker_geoip.id', '=', 'tracker_log.geoip_id')
-            ->where('log.user_id', $userId)
+            ->where('tracker_log.user_id', $userId)
             ->unique()
             ->select(
                 $this->getConnection()->raw('tracker_geoip.country_code as code,
@@ -99,7 +99,7 @@ class Log extends Base
             ->join('tracker_geoip', 'tracker_geoip.id', '=', 'tracker_log.geoip_id')
             ->join('countries', 'countries.country_code', '=', 'tracker_geoip.country_code')
             ->join('tiers', 'tiers.id', '=', 'countries.tier_id')
-            ->where('log.user_id', $userId)
+            ->where('tracker_log.user_id', $userId)
             ->unique()
             ->select(
                 $this->getConnection()->raw('DATE(tracker_log.created_at) as date, tiers.name as tier,
@@ -122,7 +122,7 @@ class Log extends Base
             ->join('tracker_geoip', 'tracker_geoip.id', '=', 'tracker_log.geoip_id')
             ->join('countries', 'countries.country_code', '=', 'tracker_geoip.country_code')
             ->join('tiers', 'tiers.id', '=', 'countries.tier_id')
-            ->where('log.user_id', $userId)
+            ->where('tracker_log.user_id', $userId)
             ->unique()
             ->select(
                 $this->getConnection()->raw('DATE(tracker_log.created_at) as date, tiers.name as tier,
