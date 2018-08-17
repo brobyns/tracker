@@ -18,10 +18,12 @@ class CreateTrackerLogTable extends Migration {
             $table->bigInteger('image_id')->unsigned()->index();
             $table->bigInteger('referer_id')->unsigned()->index();
             $table->bigInteger('geoip_id')->unsigned()->index();
+            $table->ipAddress('client_ip')->unsigned()->index();
             $table->boolean('is_real');
             $table->boolean('is_adblock');
             $table->boolean('is_proxy');
             $table->boolean('is_confirmed');
+            $table->boolean('is_unique');
 
             $table->timestamp('created_at')->index();
             $table->timestamp('updated_at')->index();

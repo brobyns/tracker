@@ -142,16 +142,21 @@ class Tracker
     protected function getLogData()
     {
         $image = $this->getImageIdAndUserId();
+        $clientIp = $this->getClientIp();
+        $isUnique = $this->isIpUnique($image->user_id, $clientIp);
+
         return [
             'session_id' => $this->getSessionId(true),
             'image_id' => $image->id,
             'user_id' => $image->user_id,
             'referer_id' => $this->getRefererId(),
             'geoip_id' => $this->getGeoIpId(),
+            'client_ip' => $clientIp,
             'is_adblock' => true,
             'is_real' => false,
             'is_proxy' => $this->isProxy(),
-            'is_confirmed' => false
+            'is_confirmed' => false,
+            'is_unique' => $isUnique
         ];
     }
 
