@@ -141,7 +141,7 @@ class Log extends Base
             ->where('tracker_log.user_id', $userId)
             ->where('tracker_log.client_ip', $clientIp)
             ->today('tracker_log')
-            ->count() === 0;
+            ->doesntExist();
     }
 
     public function scopeUnique($query)

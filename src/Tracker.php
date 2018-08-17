@@ -305,15 +305,14 @@ class Tracker
     {
         $log = $this->dataRepositoryManager->getLogById($request->get('log_id'));
         $image = $this->dataRepositoryManager->getImage($log->image_id);
-        $clientIp = $this->getClientIp();
+        $is_adblock = $request->get('is_adblock');
+        $is_real = $request->get('is_real');
 
-        if ($this->isIpUnique($log->user_id, $clientIp)) {
+        $this->dataRepositoryManager->updateLog($log,
+            ['is_adblock' => $is_adblock, 'is_real' => $is_real, 'is_confirmed' => true]);
+
+        if ($log->is_unique && !$log->is_proxy && !$is_adblock && $is_real) {
             $tier = $this->dataRepositoryManager->getTier($log->geoip_id);
-            $this->dataRepositoryManager->updateLog($log,
-                ['is_adblock' => $request->get('is_adblock'),
-                    'is_real' => $request->get('is_real'),
-                    'is_confirmed' => true]);
-
             $this->dataRepositoryManager->updateStatsForImage($log->image_id, $log->user_id, $tier->id, $tier->rate);
             $this->dataRepositoryManager->updateBalanceForUser($log->user_id, $tier->rate);
         }
