@@ -316,6 +316,7 @@ class Tracker
             $this->dataRepositoryManager->updateStatsForImage($log->image_id, $log->user_id, $tier->id, $tier->rate);
             $this->dataRepositoryManager->updateBalanceForUser($log->user_id, $tier->rate);
         }
+        
         return $image;
     }
 
