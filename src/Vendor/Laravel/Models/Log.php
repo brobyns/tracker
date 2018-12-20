@@ -140,6 +140,10 @@ class Log extends Base
         return $this
             ->where('tracker_log.user_id', $userId)
             ->where('tracker_log.client_ip', $clientIp)
+            ->where('tracker_log.is_confirmed', 1)
+            ->where('tracker_log.is_real', 1)
+            ->where('tracker_log.is_adblock', 0)
+            ->where('tracker_log.is_proxy', 0)
             ->today('tracker_log')
             ->doesntExist();
     }
