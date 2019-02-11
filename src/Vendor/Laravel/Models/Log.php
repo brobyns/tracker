@@ -125,10 +125,10 @@ class Log extends Base
             ->where('tracker_log.user_id', $userId)
             ->unique()
             ->select(
-                $this->getConnection()->raw('DATE(tracker_log.created_at) as date, tiers.name as tier,
+                $this->getConnection()->raw('tiers.name as tier,
 					count(*) as value'))
             ->groupBy(
-                Log::getConnection()->raw('tier, date')
+                Log::getConnection()->raw('tier')
             )
             ->range($startDate, $endDate, 'tracker_log')
             ->orderBy('tiers.id');
