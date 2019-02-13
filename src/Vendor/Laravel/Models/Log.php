@@ -131,7 +131,7 @@ class Log extends Base
                 Log::getConnection()->raw('tier')
             )
             ->range($startDate, $endDate, 'tracker_log')
-            ->orderBy('tiers.id');
+            ->orderBy('tier');
         return $query->get();
     }
 
