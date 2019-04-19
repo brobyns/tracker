@@ -41,13 +41,5 @@
         "psr-4": {
             "PragmaRX\\Tracker\\": "src/"
         }
-    },
-
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.1.x-dev"
-        }
-    },
-
-    "minimum-stability": "dev"
+    }
 }
