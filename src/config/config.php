@@ -82,5 +82,7 @@ return [
 
 	'tier_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Tier',
 
-    'image_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Image'
+    'image_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Image',
+
+    'tracker_secret' => 'N4aHNF32MXtTGD57'
 ];

@@ -22,8 +22,9 @@ class TrackerMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $logId = Tracker::boot();
-        $request->attributes->add(['log' => $logId]);
+        $log = Tracker::boot();
+        $request->attributes->add($log);
+
         return $next($request);
     }
 }

@@ -139,9 +139,9 @@ class Tracker
     /**
      * @return array
      */
-    protected function getLogData()
+    protected function getLogData($uuid)
     {
-        $image = $this->getImageIdAndUserId();
+        $image = $this->getImageIdAndUserId($uuid);
         $clientIp = $this->getClientIp();
         $isUnique = $this->isIpUnique($image->user_id, $clientIp);
 
@@ -198,9 +198,8 @@ class Tracker
         );
     }
 
-    public function getImageIdAndUserId()
+    public function getImageIdAndUserId($uuid)
     {
-        $uuid = basename($this->request->path());
         return $this->dataRepositoryManager->getImageIdAndUserId($uuid);
     }
 
@@ -283,8 +282,13 @@ class Tracker
 
     public function track()
     {
-        $log = $this->getLogData();
-        return $this->dataRepositoryManager->createLog($log);
+        $uuid = basename($this->request->path());
+        $log = $this->getLogData($uuid);
+        $logId = $this->dataRepositoryManager->createLog($log);
+
+        $key = $this->hashLogData($uuid, $logId);
+
+        return compact('logId', 'uuid', 'key');
     }
 
     public function getClientIp()
@@ -303,20 +307,23 @@ class Tracker
 
     public function confirmView(Request $request)
     {
-        $log = $this->dataRepositoryManager->getLogById($request->get('log_id'));
+        $logData = $this->parseObfuscatedLogData($request->get('log'));
+        $clientHash = $logData['key'];
+        $serverHash = $this->hashLogData($logData['uuid'], $logData['logId']);
+
+        $log = $this->dataRepositoryManager->getLogById($logData['logId']);
         $image = $this->dataRepositoryManager->getImage($log->image_id);
-        $is_adblock = $request->get('is_adblock');
-        $is_real = $request->get('is_real');
+        if (!$log->is_confirmed && ($clientHash == $serverHash)) {
 
-        $this->dataRepositoryManager->updateLog($log,
-            ['is_adblock' => $is_adblock, 'is_real' => $is_real, 'is_confirmed' => true]);
+            $this->dataRepositoryManager->updateLog($log,
+                ['is_adblock' => $logData['isAdblock'], 'is_real' => $logData['isReal'], 'is_confirmed' => true]);
 
-        if ($log->is_unique && !$log->is_proxy && !$is_adblock && $is_real) {
-            $tier = $this->dataRepositoryManager->getTier($log->geoip_id);
-            $this->dataRepositoryManager->updateStatsForImage($log->image_id, $log->user_id, $tier->id, $tier->rate);
-            $this->dataRepositoryManager->updateBalanceForUser($log->user_id, $tier->rate);
+            if ($log->is_unique && !$log->is_proxy && !$logData['isAdblock'] && $logData['isReal']) {
+                $tier = $this->dataRepositoryManager->getTier($log->geoip_id);
+                $this->dataRepositoryManager->updateStatsForImage($log->image_id, $log->user_id, $tier->id, $tier->rate);
+                $this->dataRepositoryManager->updateBalanceForUser($log->user_id, $tier->rate);
+            }
         }
-        
         return $image;
     }
 
@@ -355,5 +362,21 @@ class Tracker
         $success = $updater->updateGeoIpFiles($this->config->get('geoip_database_path'));
         $this->messageRepository->addMessage($updater->getMessages());
         return $success;
+    }
+
+    private function hashLogData($uuid, $logId) {
+        $secret = Config::get('tracker.tracker_secret');
+        $stringToHash = $uuid . $secret . $logId;
+        return \hash('sha512', $stringToHash);
+    }
+
+    private function parseObfuscatedLogData($data) {
+        $isReal = $data[0] == '2';
+        $isAdblock = $data[150] !== '7';
+
+        $uuid = substr($data, 1, 22);
+        $key = substr($data, 22, 128);
+        $logId = substr($data, 151);
+        return compact('isReal', 'isAdblock', 'uuid', 'key', 'logId');
     }
 }
