@@ -371,12 +371,12 @@ class Tracker
     }
 
     private function parseObfuscatedLogData($data) {
-        $isReal = $data[0] == '2';
-        $isAdblock = $data[150] !== '7';
-
+        $isReal = $data[0] === '2';
+        $isAdblock = $data[151] !== '7';
         $uuid = substr($data, 1, 22);
-        $key = substr($data, 22, 128);
-        $logId = substr($data, 151);
+        $key = substr($data, 23, 128);
+        $logId = substr($data, 152);
+
         return compact('isReal', 'isAdblock', 'uuid', 'key', 'logId');
     }
 }
