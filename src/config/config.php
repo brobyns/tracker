@@ -84,5 +84,5 @@ return [
 
     'image_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Image',
 
-    'tracker_secret' => 'N4aHNF32MXtTGD57'
+    'tracker_secret' => env('TRACKER_SECRET')
 ];

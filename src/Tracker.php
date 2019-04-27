@@ -365,7 +365,7 @@ class Tracker
     }
 
     private function hashLogData($uuid, $logId) {
-        $secret = Config::get('tracker.tracker_secret');
+        $secret = config('tracker.tracker_secret');
         $stringToHash = $uuid . $secret . $logId;
         return \hash('sha512', $stringToHash);
     }
