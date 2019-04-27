@@ -139,9 +139,8 @@ class Tracker
     /**
      * @return array
      */
-    protected function getLogData($uuid)
+    protected function getLogData($image)
     {
-        $image = $this->getImageIdAndUserId($uuid);
         $clientIp = $this->getClientIp();
         $isUnique = $this->isIpUnique($image->user_id, $clientIp);
 
@@ -283,10 +282,16 @@ class Tracker
     public function track()
     {
         $uuid = basename($this->request->path());
-        $log = $this->getLogData($uuid);
-        $logId = $this->dataRepositoryManager->createLog($log);
+        $logId = null;
+        $key = null;
+        
+        $image = $this->getImageIdAndUserId($uuid);
 
-        $key = $this->hashLogData($uuid, $logId);
+        if (!is_null($image)) {
+            $log = $this->getLogData($image);
+            $logId = $this->dataRepositoryManager->createLog($log);
+            $key = $this->hashLogData($uuid, $logId);
+        }
 
         return compact('logId', 'uuid', 'key');
     }
@@ -364,13 +369,15 @@ class Tracker
         return $success;
     }
 
-    private function hashLogData($uuid, $logId) {
+    private function hashLogData($uuid, $logId)
+    {
         $secret = config('tracker.tracker_secret');
         $stringToHash = $uuid . $secret . $logId;
         return \hash('sha512', $stringToHash);
     }
 
-    private function parseObfuscatedLogData($data) {
+    private function parseObfuscatedLogData($data)
+    {
         $isReal = $data[0] === '2';
         $isAdblock = $data[151] !== '7';
         $uuid = substr($data, 1, 22);
