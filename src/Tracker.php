@@ -284,7 +284,7 @@ class Tracker
         $uuid = basename($this->request->path());
         $logId = null;
         $key = null;
-        
+
         $image = $this->getImageIdAndUserId($uuid);
 
         if (!is_null($image)) {
@@ -378,8 +378,8 @@ class Tracker
 
     private function parseObfuscatedLogData($data)
     {
-        $isReal = $data[0] === '2';
-        $isAdblock = $data[151] !== '7';
+        $isReal = (int) $data[0] > 4;
+        $isAdblock = (int) $data[151] > 5;
         $uuid = substr($data, 1, 22);
         $key = substr($data, 23, 128);
         $logId = substr($data, 152);
