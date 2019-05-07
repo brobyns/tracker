@@ -314,7 +314,7 @@ class Tracker
     {
         $logData = $this->parseObfuscatedLogData($request->get('log'));
         $clientHash = $logData['key'];
-        $serverHash = $this->hashLogData($logData['uuid'], $logData['logId']);
+        $serverHash = $this->hashLogData($request->get('uuid'), $logData['logId']);
 
         $log = $this->dataRepositoryManager->getLogById($logData['logId']);
         $image = $this->dataRepositoryManager->getImage($log->image_id);
@@ -379,11 +379,10 @@ class Tracker
     private function parseObfuscatedLogData($data)
     {
         $isReal = (int) $data[0] > 4;
-        $isAdblock = (int) $data[151] > 5;
-        $uuid = substr($data, 1, 22);
-        $key = substr($data, 23, 128);
-        $logId = substr($data, 152);
+        $isAdblock = (int) $data[129] > 5;
+        $key = substr($data, 1, 128);
+        $logId = substr($data, 130);
 
-        return compact('isReal', 'isAdblock', 'uuid', 'key', 'logId');
+        return compact('isReal', 'isAdblock', 'key', 'logId');
     }
 }
