@@ -124,15 +124,21 @@ class Tracker
 
     protected function isProxy()
     {
-        $client = new GuzzleHttp\Client();
-        $response = $client->request('GET', 'http://www.shroomery.org/ythan/proxycheck.php', [
-            'query' => ['ip' => $this->getClientIp()]
-        ]);
+        try {
+            $client = new GuzzleHttp\Client();
+            $proxy_check_url = config('tracker.proxy_check_url');
+            $response = $client->request('GET', $proxy_check_url, [
+                'query' => ['ip' => $this->getClientIp()]
+            ]);
 
-        if ($response->getStatusCode() === 200) {
-            $stringBody = (string)$response->getBody();
-            return $stringBody === 'Y';
+            if ($response->getStatusCode() === 200) {
+                $stringBody = (string)$response->getBody();
+                return $stringBody === 'Y';
+            }
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
         }
+
         return false;
     }
 

@@ -84,5 +84,7 @@ return [
 
     'image_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Image',
 
-    'tracker_secret' => env('TRACKER_SECRET')
+    'tracker_secret' => env('TRACKER_SECRET'),
+
+    'proxy_check_url' => 'http://proxy.mind-media.com/block/proxycheck.php'
 ];
