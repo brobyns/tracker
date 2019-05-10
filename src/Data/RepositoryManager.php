@@ -262,7 +262,7 @@ class RepositoryManager implements RepositoryManagerInterface
     }
 
     public function getRefererId($referer) {
-        if ($referer) {
+        if (!empty($referer)) {
             $url = parse_url($referer);
 
             $parts = explode(".", $url['host']);
