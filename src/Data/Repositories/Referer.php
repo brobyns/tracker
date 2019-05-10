@@ -72,28 +72,7 @@ class Referer extends Repository {
 
 		$referer = $this->find($referer);
 
-		if ($parsed->isKnown())
-		{
-			$this->storeSearchTerms($referer, $parsed);
-		}
-
 		return $referer->id;
-	}
-
-	private function storeSearchTerms($referer, $parsed)
-	{
-		foreach (explode(' ', $parsed->getSearchTerm()) as $term)
-		{
-			$this->findOrCreate(
-				array(
-					'referer_id' => $referer->id,
-					'search_term' => $term
-				),
-				array('referer_id', 'search_term'),
-				$created,
-				$this->searchTermModel
-			);
-		}
 	}
 
 }
